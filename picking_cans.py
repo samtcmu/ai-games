@@ -6,12 +6,16 @@ ACTION_UP = 1
 ACTION_DOWN = 2
 ACTION_RIGHT = 3
 ACTION_LEFT = 4
+ACTION_STAY = 5
+ACTION_MOVE_RANDOM = 6
 ACTIONS = [
-    ACTION_PICK_UP_CAN,
-    ACTION_UP,
-    ACTION_DOWN,
-    ACTION_RIGHT,
-    ACTION_LEFT,
+    (ACTION_PICK_UP_CAN, "pickup can"),
+    (ACTION_UP,          "move up"),
+    (ACTION_DOWN,        "move down"),
+    (ACTION_RIGHT,       "move right"),
+    (ACTION_LEFT,        "move left"),
+    (ACTION_MOVE_RANDOM, "move random"),
+    (ACTION_STAY,        "stay"),
 ]
 
 class Board:
@@ -58,41 +62,49 @@ class Board:
     def PickUpCan(self):
         if self.ContainsCan(self._r, self._c):
             self._board[self._r][self._c] = False
-            return 1
-        return 0
+            return 10
+        return -1
 
     def MoveUp(self):
         if self._r > 0:
             self._r -= 1
             return 0
-        return -1
+        return -5
 
     def MoveDown(self):
-        if self._r < self._rows:
+        if self._r < self._rows - 1:
             self._r += 1
             return 0
-        return -1
+        return -5
 
     def MoveRight(self):
-        if self._c < self._columns:
+        if self._c < self._columns - 1:
             self._c += 1
             return 0
-        return -1
+        return -5
 
     def MoveLeft(self):
         if self._c > 0:
             self._c -=1 
             return 0
-        return -1
+        return -5
+
+    def Stay(self):
+        return 0
+
+    def MoveRandom(self):
+        move_actions = [
+            self.MoveUp, self.MoveDown, self.MoveLeft, self.MoveRight]
+        return move_actions[random.randint(0, 3)]()
 
     def PickCansWithModel(self, model, time_limit=200, verbose=False):
         score = 0
         for t in range(time_limit):
+            action = model.ActionForCurrentPosition(self, self._r, self._c)
             if verbose:
-                print (t, score)
+                print "time: %d\nscore: %d\naction: %s" % (t, score, ACTIONS[action][1])
                 print self
 
-            action = model.ActionForCurrentPosition(self, self._r, self._c)
             if action == ACTION_PICK_UP_CAN:
                 score += self.PickUpCan()
             elif action == ACTION_UP:
@@ -103,6 +115,10 @@ class Board:
                 score += self.MoveRight()
             elif action == ACTION_LEFT:
                 score += self.MoveLeft()
+            elif action == ACTION_STAY:
+                score += self.Stay()
+            elif action == ACTION_MOVE_RANDOM:
+                score += self.MoveRandom()
 
         return score
 
@@ -118,7 +134,7 @@ class Model:
 
     def Randomize(self):
         for i in range(32):
-            self._actions[i] = ACTIONS[random.randint(0, len(ACTIONS) - 1)]
+            self._actions[i] = ACTIONS[random.randint(0, len(ACTIONS) - 1)][0]
 
     def ActionForCurrentPosition(self, board, r, c):
         # Exponent of 2 for each board position relative to current position
