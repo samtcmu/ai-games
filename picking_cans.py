@@ -14,8 +14,8 @@ ACTIONS = [
     (ACTION_DOWN,        "move down"),
     (ACTION_RIGHT,       "move right"),
     (ACTION_LEFT,        "move left"),
-    (ACTION_MOVE_RANDOM, "move random"),
     (ACTION_STAY,        "stay"),
+    (ACTION_MOVE_RANDOM, "move random"),
 ]
 
 class Board:
@@ -165,6 +165,7 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
           actions_per_game=200):
     board = Board(rows, columns)
     population = [Model(randomize=True) for _ in range(population_size)]
+    fittest = None
     for g in range(generations):
         scores = [0.0 for _ in range(population_size)]
         for p in range(population_size):
@@ -184,11 +185,14 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
         second_max_score = scores[second_max_index]
         print "generation: %d" % (g,)
         print "average score: %0.02f" % (average_score,)
-        print "top performers: %0.02f, %0.02f\n" % (
+        print "top performers: %0.02f, %0.02f" % (
             max_score, second_max_score)
 
         fittest = (population[max_index], population[second_max_index])
         population = [Model(parents=fittest) for _ in range(len(population))]
+        print "1st place: %s" % (fittest[0],)
+        print "2nd place: %s\n" % (fittest[1],)
+    return fittest
 
 def MaxIndex(L):
     max_index = 0
@@ -197,13 +201,19 @@ def MaxIndex(L):
             max_index = i
     return max_index
 
-def main():
-    Train(
-        rows=10,
-        columns=10,
-        generations=100,
-        population_size=100,
-        games=100,
-        actions_per_game=200)
-
-main()
+def main(actions=None):
+    if actions is None:
+        print Train(
+            rows=10,
+            columns=10,
+            generations=500,
+            population_size=200,
+            games=200,
+            actions_per_game=200)
+    else:
+        model = Model(actions=actions)
+        board = Board(10, 10)
+        board.Randomize()
+        board.RandomizeCurrentPosition()
+        print "score: %d" % (board.PickCansWithModel(
+            model, actions_per_game=200, verbose=True),)
