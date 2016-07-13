@@ -97,9 +97,9 @@ class Board:
             self.MoveUp, self.MoveDown, self.MoveLeft, self.MoveRight]
         return move_actions[random.randint(0, 3)]()
 
-    def PickCansWithModel(self, model, time_limit=200, verbose=False):
+    def PickCansWithModel(self, model, actions_per_game=200, verbose=False):
         score = 0
-        for t in range(time_limit):
+        for t in range(actions_per_game):
             action = model.ActionForCurrentPosition(self, self._r, self._c)
             if verbose:
                 print "time: %d\nscore: %d\naction: %s" % (t, score, ACTIONS[action][1])
@@ -123,9 +123,20 @@ class Board:
         return score
 
 class Model:
-    def __init__(self, actions = None):
-        if actions is None:
+    def __init__(self, actions = None, randomize=False, parents=None):
+        if parents is not None:
             self._actions = [ACTION_UP for _ in range(32)]
+            for i in range(len(self._actions)):
+                self._actions[i] = (
+                    parents[random.randint(0, len(parents) - 1)]._actions[i])
+                self._actions[i] = (
+                    (self._actions[i] +
+                     ((1 if random.random() < 0.005 else 0) *
+                       random.randint(1, len(ACTIONS)))) % len(ACTIONS))
+        elif actions is None:
+            self._actions = [ACTION_UP for _ in range(32)]
+            if randomize:
+                self.Randomize()
         else:
             self._actions = actions
 
@@ -150,14 +161,49 @@ class Model:
         position += (1 << 4) * board.ContainsCan(r + 1, c)
         return self._actions[position]
 
-def main():
-    board = Board(10, 10)
-    board.Randomize()
-    board.RandomizeCurrentPosition()
-    print board
-    model = Model()
-    model.Randomize()
-    print model
+def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
+          actions_per_game=200):
+    board = Board(rows, columns)
+    population = [Model(randomize=True) for _ in range(population_size)]
+    for g in range(generations):
+        scores = [0.0 for _ in range(population_size)]
+        for p in range(population_size):
+            for i in range(games):
+                board.Randomize()
+                board.RandomizeCurrentPosition()
+                score = board.PickCansWithModel(
+                    population[p], actions_per_game=actions_per_game)
+                scores[p] += score
+            scores[p] /= games
 
-    print "\nscore: %d" % (board.PickCansWithModel(model),)
-    print board
+        average_score = sum(scores) / population_size
+        max_index = MaxIndex(scores)
+        max_score = scores[max_index]
+        scores[max_index] = float("-inf")
+        second_max_index = MaxIndex(scores)
+        second_max_score = scores[second_max_index]
+        print "generation: %d" % (g,)
+        print "average score: %0.02f" % (average_score,)
+        print "top performers: %0.02f, %0.02f\n" % (
+            max_score, second_max_score)
+
+        fittest = (population[max_index], population[second_max_index])
+        population = [Model(parents=fittest) for _ in range(len(population))]
+
+def MaxIndex(L):
+    max_index = 0
+    for i in range(len(L)):
+        if L[i] > L[max_index]:
+            max_index = i
+    return max_index
+
+def main():
+    Train(
+        rows=10,
+        columns=10,
+        generations=100,
+        population_size=100,
+        games=100,
+        actions_per_game=200)
+
+main()
