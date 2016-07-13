@@ -1,5 +1,6 @@
 import random
 import termcolor
+import threading
 
 ACTION_PICK_UP_CAN = 0
 ACTION_UP = 1
@@ -163,18 +164,22 @@ class Model:
 
 def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
           actions_per_game=200):
-    board = Board(rows, columns)
     population = [Model(randomize=True) for _ in range(population_size)]
     fittest = None
     for g in range(generations):
         scores = [0.0 for _ in range(population_size)]
         for p in range(population_size):
+            game_threads = []
             for i in range(games):
-                board.Randomize()
-                board.RandomizeCurrentPosition()
-                score = board.PickCansWithModel(
-                    population[p], actions_per_game=actions_per_game)
-                scores[p] += score
+                game_thread = threading.Thread(
+                    target=PlayGame,
+                    args=(rows, columns, population[p], actions_per_game, scores, p))
+                game_thread.start()
+                game_threads.append(game_thread)
+
+            for game_thread in game_threads:
+                game_thread.join(60)
+
             scores[p] /= games
 
         average_score = sum(scores) / population_size
@@ -193,6 +198,13 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
         print "1st place: %s" % (fittest[0],)
         print "2nd place: %s\n" % (fittest[1],)
     return fittest
+
+def PlayGame(rows, columns, model, actions_per_game, scores, p):
+    board = Board(rows, columns)
+    board.Randomize()
+    board.RandomizeCurrentPosition()
+    score = board.PickCansWithModel(model, actions_per_game=actions_per_game)
+    scores[p] += score
 
 def MaxIndex(L):
     max_index = 0
