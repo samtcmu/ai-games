@@ -1,3 +1,4 @@
+import Queue
 import random
 import termcolor
 import threading
@@ -164,22 +165,24 @@ class Model:
 
 def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
           actions_per_game=200):
+    game_thread_queue = Queue.Queue()
+    for i in range(games):
+        game_thread = threading.Thread(
+            target=PlayGame,
+            args=(rows, columns, actions_per_game, game_thread_queue))
+        game_thread.setDaemon(True)
+        game_thread.start()
+
     population = [Model(randomize=True) for _ in range(population_size)]
     fittest = None
     for g in range(generations):
         scores = [0.0 for _ in range(population_size)]
         for p in range(population_size):
-            game_threads = []
             for i in range(games):
-                game_thread = threading.Thread(
-                    target=PlayGame,
-                    args=(rows, columns, population[p], actions_per_game, scores, p))
-                game_thread.start()
-                game_threads.append(game_thread)
+                game_thread_queue.put((population[p], scores, p))
 
-            for game_thread in game_threads:
-                game_thread.join(60)
-
+        game_thread_queue.join()
+        for p in range(population_size):
             scores[p] /= games
 
         average_score = sum(scores) / population_size
@@ -199,12 +202,15 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
         print "2nd place: %s\n" % (fittest[1],)
     return fittest
 
-def PlayGame(rows, columns, model, actions_per_game, scores, p):
+def PlayGame(rows, columns, actions_per_game, game_thread_queue):
     board = Board(rows, columns)
-    board.Randomize()
-    board.RandomizeCurrentPosition()
-    score = board.PickCansWithModel(model, actions_per_game=actions_per_game)
-    scores[p] += score
+    while True:
+        model, scores, p = game_thread_queue.get()
+        board.Randomize()
+        board.RandomizeCurrentPosition()
+        score = board.PickCansWithModel(model, actions_per_game=actions_per_game)
+        scores[p] += score
+        game_thread_queue.task_done()
 
 def MaxIndex(L):
     max_index = 0
@@ -229,3 +235,5 @@ def main(actions=None):
         board.RandomizeCurrentPosition()
         print "score: %d" % (board.PickCansWithModel(
             model, actions_per_game=200, verbose=True),)
+
+main()
