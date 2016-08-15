@@ -29,19 +29,12 @@ class GeneticAlgorithmModel(model.Model):
             self._actions[i] = picking_cans_board.ACTIONS[
                 random.randint(0, len(picking_cans_board.ACTIONS) - 1)][0]
 
-    def ActionForCurrentPosition(self, board, r, c):
-        # Exponent of 2 for each board position relative to current position
-        # (where 4 is).
-        #      | 0 |
-        #  | 1 | 2 | 3 |
-        #      | 4 |
-        position = 0
-        position += (1 << 0) * board.ContainsCan(r - 1, c)
-        position += (1 << 1) * board.ContainsCan(r, c - 1)
-        position += (1 << 2) * board.ContainsCan(r, c)
-        position += (1 << 3) * board.ContainsCan(r, c + 1)
-        position += (1 << 4) * board.ContainsCan(r + 1, c)
+    def ActionForPosition(self, position):
         return self._actions[position]
+
+    def Update(self, initial_position, action, final_position, reward, score):
+        # Genetic algorithms do not learn in an online fashion.
+        return
 
     def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
               actions_per_game=200):

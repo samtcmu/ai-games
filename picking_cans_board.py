@@ -54,6 +54,23 @@ class Board:
         self._r = random.randint(0, self._rows - 1)
         self._c = random.randint(0, self._columns - 1)
 
+    def BoardPosition(self, r, c):
+        # Exponent of 2 for each board position relative to current position
+        # (where 4 is).
+        #      | 0 |
+        #  | 1 | 2 | 3 |
+        #      | 4 |
+        position = 0
+        position += (1 << 0) * self.ContainsCan(r - 1, c)
+        position += (1 << 1) * self.ContainsCan(r, c - 1)
+        position += (1 << 2) * self.ContainsCan(r, c)
+        position += (1 << 3) * self.ContainsCan(r, c + 1)
+        position += (1 << 4) * self.ContainsCan(r + 1, c)
+        return position
+
+    def CurrentBoardPosition(self):
+        return self.BoardPosition(self._r, self._c)
+
     def ContainsCan(self, r, c):
         return ((0 <= r < self._rows) and
                 (0 <= c < self._columns) and
@@ -100,25 +117,31 @@ class Board:
     def PickCansWithModel(self, model, actions_per_game=200, verbose=False):
         score = 0
         for t in range(actions_per_game):
-            action = model.ActionForCurrentPosition(self, self._r, self._c)
+            initial_position = self.CurrentBoardPosition()
+            action = model.ActionForPosition(initial_position)
             if verbose:
                 print "time: %d\nscore: %d\naction: %s" % (t, score, ACTIONS[action][1])
                 print self
 
+            reward = 0
             if action == ACTION_PICK_UP_CAN:
-                score += self.PickUpCan()
+                reward = self.PickUpCan()
             elif action == ACTION_UP:
-                score += self.MoveUp()
+                reward = self.MoveUp()
             elif action == ACTION_DOWN:
-                score += self.MoveDown()
+                reward = self.MoveDown()
             elif action == ACTION_RIGHT:
-                score += self.MoveRight()
+                reward = self.MoveRight()
             elif action == ACTION_LEFT:
-                score += self.MoveLeft()
+                reward = self.MoveLeft()
             elif action == ACTION_STAY:
-                score += self.Stay()
+                reward = self.Stay()
             elif action == ACTION_MOVE_RANDOM:
-                score += self.MoveRandom()
+                reward = self.MoveRandom()
+            score += reward
+
+            final_position = self.CurrentBoardPosition()
+            model.Update(initial_position, action, final_position, reward, score)
 
         return score
 
