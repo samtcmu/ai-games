@@ -144,4 +144,3 @@ class Board:
             model.Update(initial_position, action, final_position, reward, score)
 
         return score
-
