@@ -36,38 +36,40 @@ class GeneticAlgorithmModel(model.Model):
         # Genetic algorithms do not learn in an online fashion.
         return
 
-    def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
-              actions_per_game=200):
-        board = picking_cans_board.Board(rows, columns)
-        population = [Model(randomize=True) for _ in range(population_size)]
-        fittest = None
-        for g in range(generations):
-            scores = [0.0 for _ in range(population_size)]
-            for p in range(population_size):
-                for i in range(games):
-                    board.Randomize()
-                    board.RandomizeCurrentPosition()
-                    score = board.PickCansWithModel(
-                        population[p], actions_per_game=actions_per_game)
-                    scores[p] += score
-                scores[p] /= games
+def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
+          actions_per_game=200):
+    board = picking_cans_board.Board(rows, columns)
+    population = [GeneticAlgorithmModel(randomize=True)
+                  for _ in range(population_size)]
+    fittest = None
+    for g in range(generations):
+        scores = [0.0 for _ in range(population_size)]
+        for p in range(population_size):
+            for i in range(games):
+                board.Randomize()
+                board.RandomizeCurrentPosition()
+                score = board.PickCansWithModel(
+                    population[p], actions_per_game=actions_per_game)
+                scores[p] += score
+            scores[p] /= games
 
-            average_score = sum(scores) / population_size
-            max_index = MaxIndex(scores)
-            max_score = scores[max_index]
-            scores[max_index] = float("-inf")
-            second_max_index = MaxIndex(scores)
-            second_max_score = scores[second_max_index]
-            print "generation: %d" % (g,)
-            print "average score: %0.02f" % (average_score,)
-            print "top performers: %0.02f, %0.02f" % (
-                max_score, second_max_score)
+        average_score = sum(scores) / population_size
+        max_index = MaxIndex(scores)
+        max_score = scores[max_index]
+        scores[max_index] = float("-inf")
+        second_max_index = MaxIndex(scores)
+        second_max_score = scores[second_max_index]
+        print "generation: %d" % (g,)
+        print "average score: %0.02f" % (average_score,)
+        print "top performers: %0.02f, %0.02f" % (
+            max_score, second_max_score)
 
-            fittest = (population[max_index], population[second_max_index])
-            population = [Model(parents=fittest) for _ in range(len(population))]
-            print "1st place: %s" % (fittest[0],)
-            print "2nd place: %s\n" % (fittest[1],)
-        return fittest
+        fittest = (population[max_index], population[second_max_index])
+        population = [GeneticAlgorithmModel(parents=fittest)
+                      for _ in range(len(population))]
+        print "1st place: %s" % (fittest[0],)
+        print "2nd place: %s\n" % (fittest[1],)
+    return fittest
 
 def MaxIndex(L):
     max_index = 0
