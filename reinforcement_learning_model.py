@@ -23,15 +23,16 @@ class ReinforcementLearningModel(model.Model):
         assert -10 <= reward <= 10
         best_action = MaxIndices(self._q_matrix[final_position])[0]
         self._q_matrix[initial_position][action] = (
-            ((1 - self._learning_rate) *
+            ((1.0 - self._learning_rate) *
              self._q_matrix[initial_position][action]) +
             (self._learning_rate *
              (reward + (self._discount_rate *
               self._q_matrix[final_position][best_action]))))
 
-def Train(rows=10, columns=10, games=200, actions_per_game=200, verbose=False):
-    model = ReinforcementLearningModel(learning_rate=0.1,
-                                       discount_rate=0.9)
+def Train(rows=10, columns=10, games=200, actions_per_game=200,
+          learning_rate=0.1, discount_rate=0.9, verbose=False):
+    model = ReinforcementLearningModel(learning_rate=learning_rate,
+                                       discount_rate=discount_rate)
     board = picking_cans_board.Board(rows, columns)
     latest_score = [0 for _ in range(1000)]
     for i in range(1, games + 1):

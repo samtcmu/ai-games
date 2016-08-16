@@ -5,7 +5,7 @@ import random
 class GeneticAlgorithmModel(model.Model):
     def __init__(self, actions = None, randomize=False, parents=None):
         if parents is not None:
-            self._actions = [ACTION_UP for _ in range(32)]
+            self._actions = [picking_cans_board.ACTION_UP for _ in range(32)]
             for i in range(len(self._actions)):
                 self._actions[i] = (
                     parents[random.randint(0, len(parents) - 1)]._actions[i])
@@ -15,7 +15,7 @@ class GeneticAlgorithmModel(model.Model):
                        random.randint(1, len(picking_cans_board.ACTIONS)))) %
                     len(picking_cans_board.ACTIONS))
         elif actions is None:
-            self._actions = [ACTION_UP for _ in range(32)]
+            self._actions = [picking_cans_board.ACTION_UP for _ in range(32)]
             if randomize:
                 self.Randomize()
         else:
