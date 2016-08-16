@@ -20,7 +20,6 @@ class ReinforcementLearningModel(model.Model):
         return best_actions[random.randrange(len(best_actions))]
 
     def Update(self, initial_position, action, final_position, reward, score):
-        assert -10 <= reward <= 10
         best_action = MaxIndices(self._q_matrix[final_position])[0]
         self._q_matrix[initial_position][action] = (
             ((1.0 - self._learning_rate) *

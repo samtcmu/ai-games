@@ -26,8 +26,8 @@ def reinforcement_learning(train_model=True, q_matrix=None):
             columns=10,
             games=1000000,
             actions_per_game=200,
-            learning_rate=0.2,
-            discount_rate=0.9,
+            learning_rate=0.1,
+            discount_rate=0.99,
             verbose=True)
     else:
         if q_matrix:
