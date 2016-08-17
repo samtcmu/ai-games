@@ -10,7 +10,8 @@ class ReinforcementLearningModel(model.Model):
             self._q_matrix = q_matrix
         else:
             self._q_matrix = [
-                [0.0 for _ in picking_cans_board.ACTIONS] for _ in range(32)]
+                [0.0 for _ in picking_cans_board.ACTIONS]
+                for _ in range(len(picking_cans_board.CELLS) ** 5)]
 
     def __str__(self):
         return str(self._q_matrix)

@@ -18,12 +18,21 @@ ACTIONS = [
     (ACTION_MOVE_RANDOM, "move random"),
 ]
 
+CELL_EMPTY = 0
+CELL_CONTAINS_CAN = 1
+CELL_WALL = 2
+CELLS = [
+    CELL_EMPTY,
+    CELL_CONTAINS_CAN,
+    CELL_WALL,
+]
+
 class Board:
     def __init__(self, rows, columns, board=None):
         self._rows = rows
         self._columns = columns
         if board is None:
-            self._board = [[False for _ in range(columns)] for _ in range(rows)]
+            self._board = [[CELL_EMPTY for _ in range(columns)] for _ in range(rows)]
         else:
             self._board = board
 
@@ -48,7 +57,7 @@ class Board:
     def Randomize(self):
         for r in range(self._rows):
             for c in range(self._columns):
-                self._board[r][c] = random.randint(0, 1) % 2
+                self._board[r][c] = CELLS[random.randrange(len(CELLS))]
 
     def RandomizeCurrentPosition(self):
         self._r = random.randint(0, self._rows - 1)
@@ -61,24 +70,27 @@ class Board:
         #  | 1 | 2 | 3 |
         #      | 4 |
         position = 0
-        position += (1 << 0) * self.ContainsCan(r - 1, c)
-        position += (1 << 1) * self.ContainsCan(r, c - 1)
-        position += (1 << 2) * self.ContainsCan(r, c)
-        position += (1 << 3) * self.ContainsCan(r, c + 1)
-        position += (1 << 4) * self.ContainsCan(r + 1, c)
+        position += (len(CELLS) ** 0) * self.GetContents(r - 1, c)
+        position += (len(CELLS) ** 1) * self.GetContents(r, c - 1)
+        position += (len(CELLS) ** 2) * self.GetContents(r, c)
+        position += (len(CELLS) ** 3) * self.GetContents(r, c + 1)
+        position += (len(CELLS) ** 4) * self.GetContents(r + 1, c)
         return position
 
     def CurrentBoardPosition(self):
         return self.BoardPosition(self._r, self._c)
 
+    def GetContents(self, r, c):
+        if (0 <= r < self._rows) and (0 <= c < self._columns):
+            return self._board[r][c]
+        return CELL_WALL
+
     def ContainsCan(self, r, c):
-        return ((0 <= r < self._rows) and
-                (0 <= c < self._columns) and
-                self._board[r][c])
+        return CELL_CONTAINS_CAN == self.GetContents(r, c)
 
     def PickUpCan(self):
         if self.ContainsCan(self._r, self._c):
-            self._board[self._r][self._c] = False
+            self._board[self._r][self._c] = CELL_EMPTY
             return 10
         return -1
 
@@ -112,7 +124,7 @@ class Board:
     def MoveRandom(self):
         move_actions = [
             self.MoveUp, self.MoveDown, self.MoveLeft, self.MoveRight]
-        return move_actions[random.randint(0, 3)]()
+        return move_actions[random.randrange(len(move_actions))]()
 
     def PickCansWithModel(self, model, actions_per_game=200, verbose=False):
         score = 0
