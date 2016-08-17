@@ -43,9 +43,7 @@ class Board:
         output = ""
         for r in range(self._rows):
             for c in range(self._columns):
-                color = "on_yellow"
-                if self.ContainsCan(r, c):
-                    color = "on_red"
+                color = self.ColorForBoardPosition(r, c)
                 current_position_str = "  "
                 if (r == self._r) and (c == self._c):
                     current_position_str = "<>"
@@ -54,10 +52,23 @@ class Board:
             output += "|\n"
         return output
 
+    def ColorForBoardPosition(self, r, c):
+        colors = {
+            CELL_EMPTY: "on_yellow",
+            CELL_CONTAINS_CAN: "on_red",
+            CELL_WALL: "on_cyan",
+        }
+        return colors[self.GetContents(r, c)]
+
+    def BoardPositionAsString(self, r, c):
+        pass
+
     def Randomize(self):
+        inner_cells = [CELL_EMPTY, CELL_CONTAINS_CAN]
         for r in range(self._rows):
             for c in range(self._columns):
-                self._board[r][c] = CELLS[random.randrange(len(CELLS))]
+                self._board[r][c] = inner_cells[
+                    random.randrange(len(inner_cells))]
 
     def RandomizeCurrentPosition(self):
         self._r = random.randint(0, self._rows - 1)
@@ -135,7 +146,7 @@ class Board:
                 print "time: %d\nscore: %d\naction: %s\nposition: %d" % (
                     t, score, ACTIONS[action][1], initial_position)
                 print self
-                print model
+                # print model
 
             reward = 0
             if action == ACTION_PICK_UP_CAN:

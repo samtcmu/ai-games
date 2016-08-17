@@ -1,11 +1,14 @@
 import model
 import picking_cans_board
+import pickle
 import random
 
 class GeneticAlgorithmModel(model.Model):
-    def __init__(self, actions = None, randomize=False, parents=None):
+    def __init__(self, filename=None, randomize=False, parents=None):
         if parents is not None:
-            self._actions = [picking_cans_board.ACTION_UP for _ in range(32)]
+            self._actions = [
+                picking_cans_board.ACTION_UP
+                for _ in range(len(picking_cans_board.CELLS) ** 5)]
             for i in range(len(self._actions)):
                 self._actions[i] = (
                     parents[random.randint(0, len(parents) - 1)]._actions[i])
@@ -14,20 +17,32 @@ class GeneticAlgorithmModel(model.Model):
                      ((1 if random.random() < 0.005 else 0) *
                        random.randint(1, len(picking_cans_board.ACTIONS)))) %
                     len(picking_cans_board.ACTIONS))
-        elif actions is None:
-            self._actions = [picking_cans_board.ACTION_UP for _ in range(32)]
+        elif filename is None:
+            self._actions = [
+                picking_cans_board.ACTION_UP
+                for _ in range(len(picking_cans_board.CELLS) ** 5)]
             if randomize:
                 self.Randomize()
         else:
-            self._actions = actions
+            self.LoadFromFile(filename)
+
+    def Randomize(self):
+        for i in range(len(picking_cans_board.CELLS) ** 5):
+            self._actions[i] = picking_cans_board.ACTIONS[
+                random.randint(0, len(picking_cans_board.ACTIONS) - 1)][0]
 
     def __str__(self):
         return str(self._actions)
 
-    def Randomize(self):
-        for i in range(32):
-            self._actions[i] = picking_cans_board.ACTIONS[
-                random.randint(0, len(picking_cans_board.ACTIONS) - 1)][0]
+    def SaveToFile(self, filename):
+        model_file = open(filename, "w")
+        pickle.dump(self._actions, model_file)
+        model_file.close()
+
+    def LoadFromFile(self, filename):
+        model_file = open(filename, "r")
+        self._actions = pickle.load(model_file)
+        model_file.close()
 
     def ActionForPosition(self, position):
         return self._actions[position]
@@ -69,6 +84,8 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
                       for _ in range(len(population))]
         print "1st place: %s" % (fittest[0],)
         print "2nd place: %s\n" % (fittest[1],)
+        fittest[0].SaveToFile("ga-model/ga-model-%d-%d.txt" % (g, 0))
+        fittest[1].SaveToFile("ga-model/ga-model-%d-%d.txt" % (g, 1))
     return fittest
 
 def MaxIndex(L):
