@@ -86,7 +86,7 @@ class Board:
         return position
 
     def BoardPositionAsString(self, p):
-        output = ""
+        output = []
         c = len(CELLS)
 
         rows_to_print = [
@@ -96,15 +96,16 @@ class Board:
         ]
 
         for row in rows_to_print:
+            output.append("")
             if len(row) == 1:
-                output += "   "
+                output[-1] += "   "
             for col in row:
-                output += "|"
-                output += termcolor.colored(
+                output[-1] += "|"
+                output[-1] += termcolor.colored(
                     "  ", on_color=self.ColorForBoardContents(col))
-            output += "|\n"
+            output[-1] += "|"
 
-        return output
+        return "\n".join(output)
 
     def CurrentBoardPosition(self):
         return self.BoardPosition(self._r, self._c)
@@ -161,10 +162,11 @@ class Board:
             initial_position = self.CurrentBoardPosition()
             action = model.ActionForPosition(initial_position)
             if verbose:
-                print "time: %d\nscore: %d\naction: %s\nposition: %d" % (
-                    t, score, ACTIONS[action][1], initial_position)
+                print "time: %d\nscore: %d\n" % (t, score)
                 print self
-                # print model
+                print "action: %s" % (ACTIONS[action][1],)
+                print "position: %d" % (initial_position,)
+                print self.BoardPositionAsString(initial_position)
 
             reward = 0
             if action == ACTION_PICK_UP_CAN:
