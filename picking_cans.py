@@ -2,7 +2,7 @@ import genetic_algorithm_model
 import picking_cans_board
 import reinforcement_learning_model
 
-def genetic_algorithm(model_file=None):
+def genetic_algorithm(model_file=None, position=None):
     if model_file is None:
         print genetic_algorithm_model.Train(
             rows=10,
@@ -12,13 +12,22 @@ def genetic_algorithm(model_file=None):
             games=200,
             actions_per_game=200)
     else:
-        model = genetic_algorithm_model.GeneticAlgorithmModel(
-            filename=model_file)
-        board = picking_cans_board.Board(10, 10)
-        board.Randomize()
-        board.RandomizeCurrentPosition()
-        print "score: %d" % (board.PickCansWithModel(
-            model, actions_per_game=200, verbose=True),)
+        if position is None:
+            model = genetic_algorithm_model.GeneticAlgorithmModel(
+                filename=model_file)
+            board = picking_cans_board.Board(10, 10)
+            board.Randomize()
+            board.RandomizeCurrentPosition()
+            print "score: %d" % (board.PickCansWithModel(
+                model, actions_per_game=200, verbose=True),)
+        else:
+            model = genetic_algorithm_model.GeneticAlgorithmModel(
+                filename=model_file)
+            board = picking_cans_board.Board(10, 10)
+            print "position: %d\n" % (position,)
+            print board.BoardPositionAsString(position)
+            print "action: %s\n" % (
+                picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
 
 def reinforcement_learning(train_model=True, model_file=None):
     if train_model:

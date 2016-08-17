@@ -43,7 +43,7 @@ class Board:
         output = ""
         for r in range(self._rows):
             for c in range(self._columns):
-                color = self.ColorForBoardPosition(r, c)
+                color = self.ColorForBoardContents(self.GetContents(r, c))
                 current_position_str = "  "
                 if (r == self._r) and (c == self._c):
                     current_position_str = "<>"
@@ -52,16 +52,13 @@ class Board:
             output += "|\n"
         return output
 
-    def ColorForBoardPosition(self, r, c):
+    def ColorForBoardContents(self, contents):
         colors = {
             CELL_EMPTY: "on_yellow",
             CELL_CONTAINS_CAN: "on_red",
             CELL_WALL: "on_cyan",
         }
-        return colors[self.GetContents(r, c)]
-
-    def BoardPositionAsString(self, r, c):
-        pass
+        return colors[contents]
 
     def Randomize(self):
         inner_cells = [CELL_EMPTY, CELL_CONTAINS_CAN]
@@ -87,6 +84,27 @@ class Board:
         position += (len(CELLS) ** 3) * self.GetContents(r, c + 1)
         position += (len(CELLS) ** 4) * self.GetContents(r + 1, c)
         return position
+
+    def BoardPositionAsString(self, p):
+        output = ""
+        c = len(CELLS)
+
+        rows_to_print = [
+            [(p / (c ** 0)) % c],
+            [(p / (c ** 1)) % c, (p / (c ** 2)) % c, (p / (c ** 3)) % c],
+            [(p / (c ** 4)) % c]
+        ]
+
+        for row in rows_to_print:
+            if len(row) == 1:
+                output += "   "
+            for col in row:
+                output += "|"
+                output += termcolor.colored(
+                    "  ", on_color=self.ColorForBoardContents(col))
+            output += "|\n"
+
+        return output
 
     def CurrentBoardPosition(self):
         return self.BoardPosition(self._r, self._c)
