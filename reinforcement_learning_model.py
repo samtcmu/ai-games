@@ -1,20 +1,37 @@
 import model
 import picking_cans_board
+import pickle
 import random
 
 class ReinforcementLearningModel(model.Model):
-    def __init__(self, learning_rate=0.1, discount_rate=1.0, q_matrix=None):
+    def __init__(self, learning_rate=0.1, discount_rate=1.0, filename=None):
         self._learning_rate = learning_rate
         self._discount_rate = discount_rate
-        if q_matrix:
-            self._q_matrix = q_matrix
+        if filename:
+            self.LoadFromFile(filename)
         else:
             self._q_matrix = [
                 [0.0 for _ in picking_cans_board.ACTIONS]
                 for _ in range(len(picking_cans_board.CELLS) ** 5)]
 
     def __str__(self):
-        return str(self._q_matrix)
+        output = ""
+        for i in range(len(self._q_matrix)):
+            output += "%2d: " % (i,)
+            for j in range(len(self._q_matrix[i])):
+                output += "%3.3f " % (self._q_matrix[i][j],)
+            output += "\n"
+        return output
+
+    def SaveToFile(self, filename):
+        model_file = open(filename, "w")
+        pickle.dump(self._q_matrix, model_file)
+        model_file.close()
+
+    def LoadFromFile(self, filename):
+        model_file = open(filename, "r")
+        self._q_matrix = pickle.load(model_file)
+        model_file.close()
 
     def ActionForPosition(self, position):
         best_actions = MaxIndices(self._q_matrix[position])
@@ -45,7 +62,7 @@ def Train(rows=10, columns=10, games=200, actions_per_game=200,
         if verbose:
             print "game %7d: %3d %.2f" % (i, score, sum(latest_score) / float(len(latest_score)))
             if i % 10000 == 0:
-                print model
+                model.SaveToFile("rl-model/rl-model-%d.txt" % (i,))
 
     return model
 

@@ -19,7 +19,7 @@ def genetic_algorithm(actions=None):
         print "score: %d" % (board.PickCansWithModel(
             model, actions_per_game=200, verbose=True),)
 
-def reinforcement_learning(train_model=True, q_matrix=None):
+def reinforcement_learning(train_model=True, model_file=None):
     if train_model:
         print reinforcement_learning_model.Train(
             rows=10,
@@ -27,12 +27,12 @@ def reinforcement_learning(train_model=True, q_matrix=None):
             games=1000000,
             actions_per_game=200,
             learning_rate=0.1,
-            discount_rate=0.99,
+            discount_rate=0.9,
             verbose=True)
     else:
-        if q_matrix:
+        if model_file:
             model = reinforcement_learning_model.ReinforcementLearningModel(
-                0.1, 1.0, q_matrix=q_matrix)
+                0.1, 1.0, filename=model_file)
         else:
             model = reinforcement_learning_model.ReinforcementLearningModel(0.1, 1.0)
         board = picking_cans_board.Board(10, 10)

@@ -132,8 +132,10 @@ class Board:
             initial_position = self.CurrentBoardPosition()
             action = model.ActionForPosition(initial_position)
             if verbose:
-                print "time: %d\nscore: %d\naction: %s" % (t, score, ACTIONS[action][1])
+                print "time: %d\nscore: %d\naction: %s\nposition: %d" % (
+                    t, score, ACTIONS[action][1], initial_position)
                 print self
+                print model
 
             reward = 0
             if action == ACTION_PICK_UP_CAN:
