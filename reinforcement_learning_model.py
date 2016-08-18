@@ -4,9 +4,11 @@ import pickle
 import random
 
 class ReinforcementLearningModel(model.Model):
-    def __init__(self, learning_rate=0.1, discount_rate=1.0, filename=None):
+    def __init__(self, learning_rate=0.1, discount_rate=1.0,
+                 exploration_rate=0.1, filename=None):
         self._learning_rate = learning_rate
         self._discount_rate = discount_rate
+        self._exploration_rate = exploration_rate
         if filename:
             self.LoadFromFile(filename)
         else:
@@ -34,7 +36,12 @@ class ReinforcementLearningModel(model.Model):
         model_file.close()
 
     def ActionForPosition(self, position):
-        best_actions = MaxIndices(self._q_matrix[position])
+        if random.random() < self._exploration_rate:
+            # For exploration we pick a random action some of the time.
+            best_actions = [a[0] for a in picking_cans_board.ACTIONS]
+        else:
+            best_actions = MaxIndices(self._q_matrix[position])
+
         return best_actions[random.randrange(len(best_actions))]
 
     def Update(self, initial_position, action, final_position, reward, score):
@@ -47,9 +54,11 @@ class ReinforcementLearningModel(model.Model):
               self._q_matrix[final_position][best_action]))))
 
 def Train(rows=10, columns=10, games=200, actions_per_game=200,
-          learning_rate=0.1, discount_rate=0.9, verbose=False):
+          learning_rate=0.1, discount_rate=0.9, exploration_rate=0.1,
+          verbose=False):
     model = ReinforcementLearningModel(learning_rate=learning_rate,
-                                       discount_rate=discount_rate)
+                                       discount_rate=discount_rate,
+                                       exploration_rate=exploration_rate)
     board = picking_cans_board.Board(rows, columns)
     latest_score = [0 for _ in range(1000)]
     for i in range(1, games + 1):
@@ -61,7 +70,7 @@ def Train(rows=10, columns=10, games=200, actions_per_game=200,
 
         if verbose:
             print "game %7d: %3d %.2f" % (i, score, sum(latest_score) / float(len(latest_score)))
-            if i % 10000 == 0:
+            if i % 1000 == 0:
                 model.SaveToFile("rl-model/rl-model-%d.txt" % (i,))
 
     return model
