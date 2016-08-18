@@ -39,6 +39,10 @@ class Board:
         # Current position.
         self._r, self._c = (0, 0)
 
+        # Count the number of cans initially on the board.
+        self._num_cans = 0
+        self.SetNumCans()
+
     def __str__(self):
         output = ""
         for r in range(self._rows):
@@ -51,6 +55,13 @@ class Board:
                                                   on_color=color)
             output += "|\n"
         return output
+
+    def SetNumCans(self):
+        self._num_cans = 0
+        for r in range(self._rows):
+            for c in range(self._columns):
+                if self.ContainsCan(r, c):
+                    self._num_cans += 1
 
     def ColorForBoardContents(self, contents):
         colors = {
@@ -66,6 +77,7 @@ class Board:
             for c in range(self._columns):
                 self._board[r][c] = inner_cells[
                     random.randrange(len(inner_cells))]
+        self.SetNumCans()
 
     def RandomizeCurrentPosition(self):
         self._r = random.randint(0, self._rows - 1)
@@ -121,6 +133,7 @@ class Board:
     def PickUpCan(self):
         if self.ContainsCan(self._r, self._c):
             self._board[self._r][self._c] = CELL_EMPTY
+            self._num_cans -= 1
             return 10
         return -1
 

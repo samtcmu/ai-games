@@ -50,9 +50,9 @@ def reinforcement_learning(train_model=True, model_file=None):
             columns=10,
             games=100000,
             actions_per_game=200,
-            learning_rate=0.1,
-            discount_rate=0.99,
-            exploration_rate=0.01,
+            learning_rate=0.2,
+            discount_rate=0.9,
+            exploration_rate=0.001,
             verbose=True)
     else:
         if model_file:
