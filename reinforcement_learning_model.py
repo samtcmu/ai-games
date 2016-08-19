@@ -55,6 +55,7 @@ class ReinforcementLearningModel(model.Model):
 
 def Train(rows=10, columns=10, games=200, actions_per_game=200,
           learning_rate=0.1, discount_rate=0.9, exploration_rate=0.1,
+          model_save_frequency=1000, model_file_prefix=None,
           verbose=False):
     model = ReinforcementLearningModel(learning_rate=learning_rate,
                                        discount_rate=discount_rate,
@@ -70,8 +71,8 @@ def Train(rows=10, columns=10, games=200, actions_per_game=200,
 
         if verbose:
             print "game %7d: %3d %.2f" % (i, score, sum(latest_score) / float(len(latest_score)))
-            if i % 1000 == 0:
-                model.SaveToFile("rl-model/rl-model-%d.txt" % (i,))
+        if model_file_prefix and (i % model_save_frequency == 0):
+            model.SaveToFile("%s-%d.txt" % (model_file_prefix, i))
 
     return model
 

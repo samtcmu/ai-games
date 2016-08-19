@@ -53,6 +53,8 @@ def reinforcement_learning(train_model=True, model_file=None):
             learning_rate=0.2,
             discount_rate=0.9,
             exploration_rate=0.001,
+            model_save_frequency=1000,
+            model_file_prefix="output/rl-model/rl-model",
             verbose=True)
     else:
         if model_file:
