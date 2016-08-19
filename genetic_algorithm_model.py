@@ -4,7 +4,10 @@ import pickle
 import random
 
 class GeneticAlgorithmModel(model.Model):
-    def __init__(self, filename=None, randomize=False, parents=None):
+    def __init__(self, filename=None, randomize=False, parents=None,
+                 mutation_rate=0.005):
+        self._mutation_rate = mutation_rate
+
         if parents is not None:
             self._actions = [
                 picking_cans_board.ACTION_UP
@@ -14,7 +17,7 @@ class GeneticAlgorithmModel(model.Model):
                     parents[random.randint(0, len(parents) - 1)]._actions[i])
                 self._actions[i] = (
                     (self._actions[i] +
-                     ((1 if random.random() < 0.005 else 0) *
+                     ((1 if random.random() < self._mutation_rate else 0) *
                        random.randint(1, len(picking_cans_board.ACTIONS)))) %
                     len(picking_cans_board.ACTIONS))
         elif filename is None:
@@ -52,10 +55,12 @@ class GeneticAlgorithmModel(model.Model):
         return
 
 def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
-          actions_per_game=200, model_file_prefix=None, verbose=False):
+          actions_per_game=200, mutation_rate=0.005, model_file_prefix=None,
+          verbose=False):
     board = picking_cans_board.Board(rows, columns)
-    population = [GeneticAlgorithmModel(randomize=True)
-                  for _ in range(population_size)]
+    population = [
+        GeneticAlgorithmModel(randomize=True, mutation_rate=mutation_rate)
+        for _ in range(population_size)]
     fittest = None
     for g in range(generations):
         scores = [0.0 for _ in range(population_size)]
@@ -76,8 +81,9 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
         second_max_score = scores[second_max_index]
 
         fittest = (population[max_index], population[second_max_index])
-        population = [GeneticAlgorithmModel(parents=fittest)
-                      for _ in range(len(population))]
+        population = [
+            GeneticAlgorithmModel(parents=fittest, mutation_rate=mutation_rate)
+            for _ in range(len(population))]
         if verbose:
             print "generation: %d" % (g,)
             print "average score: %0.02f" % (average_score,)
