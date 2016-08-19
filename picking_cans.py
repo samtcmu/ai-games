@@ -45,11 +45,12 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
                 print "action: %s\n" % (
                     picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
 
-def reinforcement_learning(train_model=True, model_file=None):
+def reinforcement_learning(train_model=True, model_file=None, random_wall=False):
     if train_model:
         reinforcement_learning_model.Train(
             rows=10,
             columns=10,
+            random_wall=random_wall,
             games=100000,
             actions_per_game=200,
             learning_rate=0.2,
@@ -71,7 +72,7 @@ def reinforcement_learning(train_model=True, model_file=None):
                 discount_rate=1.0,
                 exploration_rate=0.0)
         board = picking_cans_board.Board(10, 10)
-        board.Randomize()
+        board.Randomize(random_wall=random_wall)
         board.RandomizeCurrentPosition()
         print "score: %d" % (board.PickCansWithModel(
             model, actions_per_game=200, verbose=True),)

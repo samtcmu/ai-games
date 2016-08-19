@@ -71,12 +71,28 @@ class Board:
         }
         return colors[contents]
 
-    def Randomize(self):
+    def Randomize(self, random_wall=False):
         inner_cells = [CELL_EMPTY, CELL_CONTAINS_CAN]
         for r in range(self._rows):
             for c in range(self._columns):
                 self._board[r][c] = inner_cells[
                     random.randrange(len(inner_cells))]
+
+        if random_wall:
+            wall_start = [random.randrange(1, self._rows - 1) for _ in range(2)]
+            wall_end = [random.randrange(1, self._rows - 1) for _ in range(2)]
+            while True:
+                self._board[wall_start[0]][wall_start[1]] = CELL_WALL
+                if wall_start == wall_end:
+                    break
+
+                if wall_start[0] != wall_end[0]:
+                    wall_start[0] += ((wall_end[0] - wall_start[0]) /
+                                      abs(wall_end[0] - wall_start[0]))
+                elif wall_start[1] != wall_end[1]:
+                    wall_start[1] += ((wall_end[1] - wall_start[1]) /
+                                      abs(wall_end[1] - wall_start[1]))
+
         self.SetNumCans()
 
     def RandomizeCurrentPosition(self):
@@ -127,6 +143,9 @@ class Board:
             return self._board[r][c]
         return CELL_WALL
 
+    def ContainsWall(self, r, c):
+        return CELL_WALL == self.GetContents(r, c)
+
     def ContainsCan(self, r, c):
         return CELL_CONTAINS_CAN == self.GetContents(r, c)
 
@@ -138,25 +157,25 @@ class Board:
         return -1
 
     def MoveUp(self):
-        if self._r > 0:
+        if not self.ContainsWall(self._r - 1, self._c):
             self._r -= 1
             return 0
         return -5
 
     def MoveDown(self):
-        if self._r < self._rows - 1:
+        if not self.ContainsWall(self._r + 1, self._c):
             self._r += 1
             return 0
         return -5
 
     def MoveRight(self):
-        if self._c < self._columns - 1:
+        if not self.ContainsWall(self._r, self._c + 1):
             self._c += 1
             return 0
         return -5
 
     def MoveLeft(self):
-        if self._c > 0:
+        if not self.ContainsWall(self._r, self._c - 1):
             self._c -=1 
             return 0
         return -5
