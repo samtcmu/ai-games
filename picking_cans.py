@@ -11,6 +11,7 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
             population_size=200,
             games=200,
             actions_per_game=200,
+            mutation_rate=0.005,
             model_file_prefix="output/ga-model/ga-model",
             verbose=True)
     elif models_to_diff:
