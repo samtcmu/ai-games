@@ -96,8 +96,11 @@ class Board:
         self.SetNumCans()
 
     def RandomizeCurrentPosition(self):
-        self._r = random.randint(0, self._rows - 1)
-        self._c = random.randint(0, self._columns - 1)
+        while True:
+            self._r = random.randint(0, self._rows - 1)
+            self._c = random.randint(0, self._columns - 1)
+            if not self.ContainsWall(self._r, self._c):
+                break
 
     def BoardPosition(self, r, c):
         # Exponent of 2 for each board position relative to current position

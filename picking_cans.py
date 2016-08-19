@@ -55,7 +55,7 @@ def reinforcement_learning(train_model=True, model_file=None, random_wall=False)
             actions_per_game=200,
             learning_rate=0.2,
             discount_rate=0.9,
-            exploration_rate=0.001,
+            exploration_rate=0.002,
             model_save_frequency=1000,
             model_file_prefix="output/rl-model/rl-model",
             verbose=True)
