@@ -191,8 +191,10 @@ class Board:
             self.MoveUp, self.MoveDown, self.MoveLeft, self.MoveRight]
         return move_actions[random.randrange(len(move_actions))]()
 
-    def PickCansWithModel(self, model, actions_per_game=200, verbose=False):
+    def PickCansWithModel(self, model, actions_per_game=200,
+                          completion_bonus=False, verbose=False):
         score = 0
+        all_cans_bonus_reached = False
         for t in range(actions_per_game):
             initial_position = self.CurrentBoardPosition()
             action = model.ActionForPosition(initial_position)
@@ -218,6 +220,12 @@ class Board:
                 reward = self.Stay()
             elif action == ACTION_MOVE_RANDOM:
                 reward = self.MoveRandom()
+
+            if (completion_bonus and (self._num_cans == 0) and
+                (not all_cans_bonus_reached)):
+                reward += score
+                all_cans_bonus_reached = True
+
             score += reward
 
             final_position = self.CurrentBoardPosition()
