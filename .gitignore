@@ -1,3 +1,5 @@
+*.pyc
+*.pyc
 output/rl-model/
 output/ga-model/
 output/rl-model/*
