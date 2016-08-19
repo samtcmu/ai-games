@@ -14,11 +14,11 @@ class GeneticAlgorithmModel(model.Model):
                 for _ in range(len(picking_cans_board.CELLS) ** 5)]
             for i in range(len(self._actions)):
                 self._actions[i] = (
-                    parents[random.randint(0, len(parents) - 1)]._actions[i])
+                    random.choice(parents)._actions[i])
                 self._actions[i] = (
                     (self._actions[i] +
-                     ((1 if random.random() < self._mutation_rate else 0) *
-                       random.randint(1, len(picking_cans_board.ACTIONS)))) %
+                     ((1 if random.random() < 0.005 else 0) *
+                       random.choice(picking_cans_board.ACTIONS)[0])) %
                     len(picking_cans_board.ACTIONS))
         elif filename is None:
             self._actions = [
@@ -31,8 +31,7 @@ class GeneticAlgorithmModel(model.Model):
 
     def Randomize(self):
         for i in range(len(picking_cans_board.CELLS) ** 5):
-            self._actions[i] = picking_cans_board.ACTIONS[
-                random.randint(0, len(picking_cans_board.ACTIONS) - 1)][0]
+            self._actions[i] = random.choice(picking_cans_board.ACTIONS)[0]
 
     def __str__(self):
         return str(self._actions)

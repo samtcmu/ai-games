@@ -42,7 +42,7 @@ class ReinforcementLearningModel(model.Model):
         else:
             best_actions = MaxIndices(self._q_matrix[position])
 
-        return best_actions[random.randrange(len(best_actions))]
+        return random.choice(best_actions)
 
     def Update(self, initial_position, action, final_position, reward, score):
         best_action = MaxIndices(self._q_matrix[final_position])[0]
