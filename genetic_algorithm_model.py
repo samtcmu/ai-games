@@ -52,7 +52,7 @@ class GeneticAlgorithmModel(model.Model):
         return
 
 def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
-          actions_per_game=200):
+          actions_per_game=200, model_file_prefix=None, verbose=False):
     board = picking_cans_board.Board(rows, columns)
     population = [GeneticAlgorithmModel(randomize=True)
                   for _ in range(population_size)]
@@ -74,18 +74,18 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
         scores[max_index] = float("-inf")
         second_max_index = MaxIndex(scores)
         second_max_score = scores[second_max_index]
-        print "generation: %d" % (g,)
-        print "average score: %0.02f" % (average_score,)
-        print "top performers: %0.02f, %0.02f" % (
-            max_score, second_max_score)
 
         fittest = (population[max_index], population[second_max_index])
         population = [GeneticAlgorithmModel(parents=fittest)
                       for _ in range(len(population))]
-        print "1st place: %s" % (fittest[0],)
-        print "2nd place: %s\n" % (fittest[1],)
-        fittest[0].SaveToFile("ga-model/ga-model-%d-%d.txt" % (g, 0))
-        fittest[1].SaveToFile("ga-model/ga-model-%d-%d.txt" % (g, 1))
+        if verbose:
+            print "generation: %d" % (g,)
+            print "average score: %0.02f" % (average_score,)
+            print "top performers: %0.02f, %0.02f" % (
+                max_score, second_max_score)
+
+        fittest[0].SaveToFile("%s-%d-%d.txt" % (model_file_prefix, g, 0))
+        fittest[1].SaveToFile("%s-%d-%d.txt" % (model_file_prefix, g, 1))
     return fittest
 
 def MaxIndex(L):

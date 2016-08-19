@@ -10,7 +10,9 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
             generations=500,
             population_size=200,
             games=200,
-            actions_per_game=200)
+            actions_per_game=200,
+            model_file_prefix="output/ga-model/ga-model",
+            verbose=True)
     elif models_to_diff:
         board = picking_cans_board.Board(10, 10)
         models = [genetic_algorithm_model.GeneticAlgorithmModel(
