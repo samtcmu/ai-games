@@ -7,10 +7,10 @@ def LinearRegressionTest():
     test_data = CreateTrainingData(expected_weights, 500, -100.0, 100.0)
 
     model = linear_regression.LinearRegression(len(expected_weights))
-    model.RandomizeSynapticWeights(random_range=(-1.0, 1.0))
+    model.RandomizeSynapticWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
                 learning_rate=0.00000001,
-                learning_iterations=200,
+                learning_iterations=1000,
                 verbose=True)
 
     total_difference = 0
