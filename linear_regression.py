@@ -26,18 +26,23 @@ class LinearRegression:
             output += (-0.5 * (t[1] - c)**2)
         return output
 
-    def _PartialDerivative(self, training_data, classifications, i):
+    def _PartialDerivative(self, training_data, classifications, i, verbose=False):
         weight_partial_derivative = 0.0
         for t, c in zip(training_data, classifications):
-            weight_partial_derivative += (
-                (t[1] - c) * t[0][i])
+            weight_partial_derivative += (t[1] - c) * t[0][i]
+            if verbose:
+                print (i, t[1], c, t[1] - c, t[0][i])
         return weight_partial_derivative
 
-    def _WeightsGradient(self, training_data, classifications):
+    def _WeightsGradient(self, training_data, classifications, verbose=False):
         weights_gradient = [0.0 for _ in self._weights]
         for i in range(len(weights_gradient)):
             weights_gradient[i] = self._PartialDerivative(
-                training_data, classifications, i)
+                training_data, classifications, i, verbose=verbose)
+
+        if verbose:
+            print weights_gradient
+
         return weights_gradient
 
     def Train(self, training_data, learning_rate=1.0, learning_iterations=1,
@@ -58,7 +63,7 @@ class LinearRegression:
 
             for t, c in zip(training_data, current_classifications):
                 weights_gradient = self._WeightsGradient(
-                    [t], [c])
+                    [t], [c], verbose=False)
                 self._weights = VectorSum(
                     self._weights,
                     VectorScalarProduct(learning_rate, weights_gradient))

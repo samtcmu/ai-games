@@ -18,13 +18,13 @@ def LinearRegressionTest():
         total_difference += abs(model.Infer(t[0]) - t[1])
     print "average absolute difference on test data: %.3f" % (total_difference / len(test_data),)
     
-def CreateTrainingData(weights, num_training_examples, low, high):
+def CreateTrainingData(weights, num_training_examples, low, high, noise_stdev=5.0):
     training_data = []
     for i in range(num_training_examples):
         input_data = RandomVector(len(weights), low, high)
         expected_output = (
             linear_regression.VectorDotProduct(input_data, weights) + 
-            random.gauss(0.0, 5.0))
+            random.gauss(0.0, noise_stdev))
         training_data.append([input_data, expected_output])
     return training_data
         

@@ -4,7 +4,7 @@ import reinforcement_learning_model
 
 def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
     if (model_file is None) and (models_to_diff is None):
-        print genetic_algorithm_model.Train(
+        genetic_algorithm_model.Train(
             rows=10,
             columns=10,
             generations=500,
