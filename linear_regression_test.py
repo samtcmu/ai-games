@@ -3,22 +3,26 @@ import random
 
 def LinearRegressionTest():
     expected_weights = [1.0, 2.0, 3.0]
-    training_data = CreateTrainingData(expected_weights, 1000, -100.0, 100.0)
-    test_data = CreateTrainingData(expected_weights, 500, -100.0, 100.0)
+    training_data = CreateTrainingData(
+        expected_weights, 1000, -100.0, 100.0, noise_stdev=5.0)
+    test_data = CreateTrainingData(
+        expected_weights, 500, -100.0, 100.0, noise_stdev=5.0)
 
     model = linear_regression.LinearRegression(len(expected_weights))
     model.RandomizeSynapticWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
-                learning_rate=0.00000001,
-                learning_iterations=1000,
+                learning_rate=0.0000005,
+                learning_iterations=5000,
                 verbose=True)
 
     total_difference = 0
     for t in test_data:
         total_difference += abs(model.Infer(t[0]) - t[1])
-    print "average absolute difference on test data: %.3f" % (total_difference / len(test_data),)
+    print "average absolute difference on test data: %.3f" % (
+        total_difference / len(test_data),)
     
-def CreateTrainingData(weights, num_training_examples, low, high, noise_stdev=5.0):
+def CreateTrainingData(weights, num_training_examples, low, high,
+                       noise_stdev=5.0):
     training_data = []
     for i in range(num_training_examples):
         input_data = RandomVector(len(weights), low, high)
