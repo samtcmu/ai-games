@@ -30,8 +30,6 @@ class LinearRegression:
         weight_partial_derivative = 0.0
         for t, c in zip(training_data, classifications):
             weight_partial_derivative += (t[1] - c) * t[0][i]
-            if verbose:
-                print (i, t[1], c, t[1] - c, t[0][i])
         return weight_partial_derivative
 
     def _WeightsGradient(self, training_data, classifications, verbose=False):
@@ -39,19 +37,21 @@ class LinearRegression:
         for i in range(len(weights_gradient)):
             weights_gradient[i] = self._PartialDerivative(
                 training_data, classifications, i, verbose=verbose)
-
-        if verbose:
-            print weights_gradient
-
         return weights_gradient
 
+    def _RegularizationGradient(self, regularization_rate):
+        return VectorScalarProduct(2 * regularization_rate, self._weights)
+
     def Train(self, training_data, learning_rate=1.0, learning_iterations=1,
-              verbose=False):
+              regularization_rate=1.0, verbose=False):
         return self._Train([([-1.0] + t[0], t[1]) for t in training_data],
-                           learning_rate, learning_iterations, verbose)
+                           learning_rate=learning_rate,
+                           learning_iterations=learning_iterations,
+                           regularization_rate=regularization_rate,
+                           verbose=verbose)
 
     def _Train(self, training_data, learning_rate=1.0, learning_iterations=1,
-               verbose=False):
+               regularization_rate=1.0, verbose=False):
         for k in range(learning_iterations):
             random.shuffle(training_data)
             current_classifications = [self._Infer(t[0]) for t in training_data]
@@ -64,6 +64,9 @@ class LinearRegression:
             for t, c in zip(training_data, current_classifications):
                 weights_gradient = self._WeightsGradient(
                     [t], [c], verbose=False)
+                weights_gradient = VectorDifference(
+                    weights_gradient,
+                    self._RegularizationGradient(regularization_rate))
                 self._weights = VectorSum(
                     self._weights,
                     VectorScalarProduct(learning_rate, weights_gradient))

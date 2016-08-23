@@ -14,6 +14,7 @@ def LinearRegressionTest():
     model.Train(training_data,
                 learning_rate=0.0000005,
                 learning_iterations=10000,
+                regularization_rate=0.0,
                 verbose=True)
 
     total_difference = 0
