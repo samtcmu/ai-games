@@ -7,7 +7,7 @@ class LinearRegression:
         self._weights = [0.0 for _ in range(self._inputs)]
 
     def __str__(self):
-        return "[%s]" % (",".join("%.3f" % (w) for w in self._weights))
+        return "[%s]" % (", ".join("%.3f" % (w) for w in self._weights))
 
     def RandomizeSynapticWeights(self, random_range=(-1.0, 1.0)):
         for i in range(self._inputs):
