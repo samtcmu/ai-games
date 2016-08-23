@@ -13,7 +13,7 @@ def LinearRegressionTest():
     model.RandomizeSynapticWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
                 learning_rate=0.0000005,
-                learning_iterations=100000,
+                learning_iterations=10000,
                 verbose=True)
 
     total_difference = 0
