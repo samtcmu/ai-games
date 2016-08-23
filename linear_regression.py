@@ -51,7 +51,7 @@ class LinearRegression:
                            verbose=verbose)
 
     def _Train(self, training_data, learning_rate=1.0, learning_iterations=1,
-               regularization_rate=1.0, verbose=False):
+               regularization_rate=0.0, verbose=False):
         for k in range(learning_iterations):
             random.shuffle(training_data)
             current_classifications = [self._Infer(t[0]) for t in training_data]
