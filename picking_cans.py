@@ -1,6 +1,7 @@
 import genetic_algorithm_model
 import picking_cans_board
 import reinforcement_learning_model
+import shallow_q_learning_model
 
 def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
     if (model_file is None) and (models_to_diff is None):
@@ -69,6 +70,40 @@ def reinforcement_learning(train_model=True, model_file=None, random_wall=False)
                 filename=model_file)
         else:
             model = reinforcement_learning_model.ReinforcementLearningModel(
+                learning_rate=0.1,
+                discount_rate=1.0,
+                exploration_rate=0.0)
+        board = picking_cans_board.Board(10, 10)
+        board.Randomize(random_wall=random_wall)
+        board.RandomizeCurrentPosition()
+        print "score: %d" % (board.PickCansWithModel(
+            model, actions_per_game=200, verbose=True),)
+
+def shallow_q_learning(train_model=True, model_file=None, random_wall=False):
+    if train_model:
+        shallow_q_learning_model.Train(
+            rows=10,
+            columns=10,
+            random_wall=random_wall,
+            games=100000,
+            actions_per_game=200,
+            learning_rate=0.2,
+            discount_rate=0.9,
+            exploration_rate=0.002,
+            linear_regression_learning_rate=0.0000005,
+            model_save_frequency=1000,
+            model_file_prefix="output/sql-model/sql-model",
+            verbose=True)
+    else:
+        if model_file:
+            model = shallow_q_learning_model.ShallowQLearningModel(
+                learning_rate=0.1,
+                discount_rate=1.0,
+                exploration_rate=0.0,
+                linear_regression_learning_rate=0.0000005,
+                filename=model_file)
+        else:
+            model = shallow_q_learning_model.ShallowQLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
                 exploration_rate=0.0)

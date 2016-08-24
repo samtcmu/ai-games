@@ -1,0 +1,14 @@
+(ilinear_regression
+LinearRegression
+p0
+(dp1
+S'_weights'
+p2
+(lp3
+F0.24138499559580015
+aF-0.07114751385815528
+aF-0.9429464661407445
+asS'_inputs'
+p4
+I3
+sb.

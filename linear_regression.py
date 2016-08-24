@@ -9,7 +9,7 @@ class LinearRegression:
     def __str__(self):
         return "[%s]" % (", ".join("%.3f" % (w) for w in self._weights))
 
-    def RandomizeSynapticWeights(self, random_range=(-1.0, 1.0)):
+    def RandomizeWeights(self, random_range=(-1.0, 1.0)):
         for i in range(self._inputs):
             self._weights[i] = random.uniform(
                 random_range[0], random_range[1])

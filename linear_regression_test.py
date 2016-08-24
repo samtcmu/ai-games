@@ -10,7 +10,7 @@ def LinearRegressionTest():
         expected_weights, 500, -100.0, 100.0, noise_stdev=noise_stdev)
 
     model = linear_regression.LinearRegression(len(expected_weights) - 1)
-    model.RandomizeSynapticWeights(random_range=(-1000.0, 1000.0))
+    model.RandomizeWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
                 learning_rate=0.0000005,
                 learning_iterations=10000,
