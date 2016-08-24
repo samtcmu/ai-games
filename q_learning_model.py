@@ -3,7 +3,7 @@ import picking_cans_board
 import pickle
 import random
 
-class ReinforcementLearningModel(model.Model):
+class QLearningModel(model.Model):
     def __init__(self, learning_rate=0.1, discount_rate=1.0,
                  exploration_rate=0.1, filename=None):
         self._learning_rate = learning_rate
@@ -57,9 +57,9 @@ def Train(rows=10, columns=10, random_wall=False, games=200,
           actions_per_game=200, learning_rate=0.1, discount_rate=0.9,
           exploration_rate=0.1, model_save_frequency=1000,
           model_file_prefix=None, verbose=False):
-    model = ReinforcementLearningModel(learning_rate=learning_rate,
-                                       discount_rate=discount_rate,
-                                       exploration_rate=exploration_rate)
+    model = QLearningModel(learning_rate=learning_rate,
+                           discount_rate=discount_rate,
+                           exploration_rate=exploration_rate)
     board = picking_cans_board.Board(rows, columns)
     latest_score = [0 for _ in range(1000)]
     for i in range(1, games + 1):

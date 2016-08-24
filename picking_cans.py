@@ -1,6 +1,6 @@
 import genetic_algorithm_model
 import picking_cans_board
-import reinforcement_learning_model
+import q_learning_model
 import shallow_q_learning_model
 
 def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
@@ -47,9 +47,9 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
                 print "action: %s\n" % (
                     picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
 
-def reinforcement_learning(train_model=True, model_file=None, random_wall=False):
+def q_learning(train_model=True, model_file=None, random_wall=False):
     if train_model:
-        reinforcement_learning_model.Train(
+        q_learning_model.Train(
             rows=10,
             columns=10,
             random_wall=random_wall,
@@ -59,17 +59,17 @@ def reinforcement_learning(train_model=True, model_file=None, random_wall=False)
             discount_rate=0.9,
             exploration_rate=0.002,
             model_save_frequency=1000,
-            model_file_prefix="output/rl-model/rl-model",
+            model_file_prefix="output/ql-model/ql-model",
             verbose=True)
     else:
         if model_file:
-            model = reinforcement_learning_model.ReinforcementLearningModel(
+            model = q_learning_model.QLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
                 exploration_rate=0.0,
                 filename=model_file)
         else:
-            model = reinforcement_learning_model.ReinforcementLearningModel(
+            model = q_learning_model.QLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
                 exploration_rate=0.0)

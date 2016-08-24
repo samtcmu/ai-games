@@ -1,8 +1,10 @@
 *.pyc
 *.pyc
 output/ga-model/
+output/ql-model/
 output/rl-model/
 output/sql-model/
 output/ga-model/*
+output/ql-model/*
 output/rl-model/*
 output/sql-model/*
