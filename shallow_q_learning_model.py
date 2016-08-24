@@ -15,7 +15,8 @@ class ShallowQLearningModel(model.Model):
         if filename:
             self.LoadFromFile(filename)
         else:
-            self._q_matrix_model = linear_regression.LinearRegression(2)
+            self._q_matrix_model = linear_regression.LinearRegression(
+                len(picking_cans_board.CELLS)**5 * len(picking_cans_board.ACTIONS))
             self._q_matrix_model.RandomizeWeights(random_range=(-1.0, 1.0))
 
     def __str__(self):
@@ -31,31 +32,37 @@ class ShallowQLearningModel(model.Model):
         self._q_matrix_model = pickle.load(model_file)
         model_file.close()
 
+    def _FeatureVector(self, position, action):
+        feature_vector = [[0.0 for _ in range(len(picking_cans_board.CELLS)**5)]
+                               for _ in range(len(picking_cans_board.ACTIONS))]
+        feature_vector[action][position] = 1.0
+        return reduce(lambda x, y: x + y, feature_vector, [])
+
     def ActionForPosition(self, position):
         if random.random() < self._exploration_rate:
             # For exploration we pick a random action some of the time.
             best_actions = [a[0] for a in picking_cans_board.ACTIONS]
         else:
-            action_values = [self._q_matrix_model.Infer([position, a[0]])
+            action_values = [self._q_matrix_model.Infer(self._FeatureVector(position, a[0]))
                              for a in picking_cans_board.ACTIONS]
             best_actions = MaxIndices(action_values)
 
         return random.choice(best_actions)
 
     def Update(self, initial_position, action, final_position, reward, score):
-        action_values = [self._q_matrix_model.Infer([final_position, a[0]])
+        action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_position, a[0]))
                          for a in picking_cans_board.ACTIONS]
         best_action = MaxIndices(action_values)[0]
         updated_q_value = (
             ((1.0 - self._learning_rate) *
-             self._q_matrix_model.Infer([initial_position, action])) +
+             self._q_matrix_model.Infer(self._FeatureVector(initial_position, action))) +
             (self._learning_rate *
              (reward + (self._discount_rate *
-              self._q_matrix_model.Infer(
-                  [final_position, best_action])))))
+              self._q_matrix_model.Infer(self._FeatureVector(
+                  final_position, best_action))))))
 
         self._q_matrix_model.Train([
-            [[initial_position, action], updated_q_value]],
+            [self._FeatureVector(initial_position, action), updated_q_value]],
             learning_rate=self._linear_regression_learning_rate,
             learning_iterations=1,
             regularization_rate=0.0,
