@@ -87,11 +87,11 @@ def shallow_q_learning(train_model=True, model_file=None, random_wall=False):
             random_wall=random_wall,
             games=100000,
             actions_per_game=200,
-            learning_rate=0.5,
+            learning_rate=0.2,
             discount_rate=0.9,
-            exploration_rate=0.1,
-            linear_regression_learning_rate=0.1,
-            model_save_frequency=1000,
+            exploration_rate=0.02,
+            linear_regression_learning_rate=0.01,
+            model_save_frequency=100,
             model_file_prefix="output/sql-model/sql-model",
             verbose=True)
     else:

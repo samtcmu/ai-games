@@ -16,7 +16,8 @@ class ShallowQLearningModel(model.Model):
             self.LoadFromFile(filename)
         else:
             self._q_matrix_model = linear_regression.LinearRegression(
-                len(picking_cans_board.CELLS)**5 * len(picking_cans_board.ACTIONS))
+                (len(picking_cans_board.CELLS) * 5) + len(picking_cans_board.ACTIONS) +
+                (len(picking_cans_board.CELLS) * len(picking_cans_board.ACTIONS) * 5))
             self._q_matrix_model.RandomizeWeights(random_range=(-1.0, 1.0))
 
     def __str__(self):
@@ -32,10 +33,37 @@ class ShallowQLearningModel(model.Model):
         self._q_matrix_model = pickle.load(model_file)
         model_file.close()
 
+    def _PositionAsArray(self, p):
+        c = len(picking_cans_board.CELLS)
+        output = [0.0 for _ in range(5)]
+        for i in range(5):
+            output[i] = (p / (c**i)) % c
+        return output
+
     def _FeatureVector(self, position, action):
-        feature_vector = [[0.0 for _ in range(len(picking_cans_board.CELLS)**5)]
-                               for _ in range(len(picking_cans_board.ACTIONS))]
-        feature_vector[action][position] = 1.0
+        feature_vector = []
+        position_array = self._PositionAsArray(position)
+
+        # For each of the cells in the position add a categorical feature for
+        # each of the possible contents of the cell.
+        for c in position_array:
+            feature = [0.0 for _ in range(len(picking_cans_board.CELLS))]
+            feature[int(c)] = 1.0
+            feature_vector.append(feature)
+
+        # Add a categorical feature for each of the possible actions.
+        feature = [0.0 for _ in range(len(picking_cans_board.ACTIONS))]
+        feature[int(action)] = 1.0
+        feature_vector.append(feature)
+
+        # Add a categorical feature for each combination of position cell, its
+        # contents, and action.
+        for c in position_array:
+            feature = [0.0 for _ in range(len(picking_cans_board.ACTIONS) *
+                                          len(picking_cans_board.CELLS))]
+            feature[int(c) * action] = 1.0
+            feature_vector.append(feature)
+
         return reduce(lambda x, y: x + y, feature_vector, [])
 
     def ActionForPosition(self, position):
