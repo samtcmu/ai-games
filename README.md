@@ -3,6 +3,30 @@
 The goal of this project is to collect various AIs that can learn to play simple
 games.
 
+# Shallow Q-Learning
+
+To train a model run the following:
+
+```
+mkdir -p output/sql-model
+python -c 'import picking_cans; picking_cans.shallow_q_learning()'
+```
+
+As training continues model files will be written to the output directory.
+
+```
+% ls output/sql-model
+sql-model-100.txt       sql-model-200.txt      sql-model-300.txt      sql-model-400.txt
+```
+
+Models will be saved to output/sql-model. To run a model (say
+output/ql-model/sql-model-400.txt) on a random board run the following:
+
+```
+python -c 'import picking_cans; picking_cans.shallow_q_learning(\
+    train_model=False, model_file="output/sql-model/sql-model-400.txt")' | less -r
+```
+
 # Q-Learning
 
 To train a model run the following:
