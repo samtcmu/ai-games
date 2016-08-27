@@ -1,7 +1,33 @@
 import genetic_algorithm_model
+import manual_model
 import picking_cans_board
 import q_learning_model
 import shallow_q_learning_model
+
+def manual_algorithm(positions=None, test_model=False):
+    model = manual_model.ManualModel()
+    board = picking_cans_board.Board(10, 10)
+    board.Randomize()
+    board.RandomizeCurrentPosition()
+    if positions is not None:
+        for position in positions:
+            print "position: %d\n" % (position,)
+            print board.BoardPositionAsString(position)
+            print "action: %s\n" % (
+                picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
+    elif test_model:
+        test_trials=1000
+        total_score = 0
+        for i in range(1, test_trials + 1):
+            board.Randomize()
+            board.RandomizeCurrentPosition()
+            score = board.PickCansWithModel(model, actions_per_game=200)
+            total_score += score
+            print "game %4d: %d" % (i, score)
+        print "average score: %0.3f" % (total_score / float(test_trials),)
+    else:
+        print "score: %d" % (board.PickCansWithModel(
+            model, actions_per_game=200, verbose=True),)
 
 def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
     if (model_file is None) and (models_to_diff is None):
