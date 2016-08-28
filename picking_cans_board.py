@@ -40,9 +40,27 @@ class AgentState():
         self._state = [[None for _ in range(3)] for _ in range(3)]
         self._state[0][1] = board.GetContents(r - 1, c)
         self._state[1][0] = board.GetContents(r, c - 1)
-        self._state[1][1] += board.GetContents(r, c)
-        self._state[1][2] += board.GetContents(r, c + 1)
-        self._state[2][1] += board.GetContents(r + 1, c)
+        self._state[1][1] = board.GetContents(r, c)
+        self._state[1][2] = board.GetContents(r, c + 1)
+        self._state[2][1] = board.GetContents(r + 1, c)
+
+    def __str__(self):
+        output = []
+        for row in self._state:
+            output.append([])
+            for cell in row:
+                if cell is not None:
+                    output[-1].append(termcolor.colored(
+                        "  ", on_color=Board.ColorForBoardContents(cell)))
+                else:
+                    output[-1].append("  ")
+
+            # Handle placing the separators.
+            output[-1] = (("|" if row[0] is not None else " ") +
+                          "|".join(output[-1]) +
+                          ("|" if row[-1] is not None else " "))
+
+        return "\n".join(output)
 
     def __int__(self):
         # Exponent of 2 for each board cell relative to current cell
@@ -58,6 +76,8 @@ class AgentState():
         output += (len(CELLS) ** 4) * self._state[2][1]
         return output
 
+    def GetContents(self, r, c):
+        return self._state[r][c]
 
 class Board:
     def __init__(self, rows, columns, board=None):
@@ -79,7 +99,7 @@ class Board:
         output = ""
         for r in range(self._rows):
             for c in range(self._columns):
-                color = self.ColorForBoardContents(self.GetContents(r, c))
+                color = Board.ColorForBoardContents(self.GetContents(r, c))
                 current_position_str = "  "
                 if (r == self._r) and (c == self._c):
                     current_position_str = "<>"
@@ -95,7 +115,8 @@ class Board:
                 if self.ContainsCan(r, c):
                     self._num_cans += 1
 
-    def ColorForBoardContents(self, contents):
+    @staticmethod
+    def ColorForBoardContents(contents):
         colors = {
             CELL_EMPTY: "on_yellow",
             CELL_CONTAINS_CAN: "on_red",
@@ -231,15 +252,15 @@ class Board:
         score = 0
         all_cans_bonus_reached = False
         for t in range(actions_per_game):
-            # initial_state = self.CurrentBoardState()
+            initial_state = self.CurrentAgentState()
             initial_position = self.CurrentBoardPosition()
             action = model.ActionForPosition(initial_position)
             if verbose:
                 print "time: %d\nscore: %d\n" % (t, score)
                 print self
                 print "action: %s" % (ACTIONS[action][1],)
-                print "position: %d" % (initial_position,)
-                print self.BoardPositionAsString(initial_position)
+                print "position: %d" % (int(initial_state),)
+                print initial_state
 
             reward = 0
             if action == ACTION_PICK_UP_CAN:
@@ -265,6 +286,7 @@ class Board:
             score += reward
 
             final_position = self.CurrentBoardPosition()
+            final_state = self.CurrentAgentState()
             model.Update(initial_position, action, final_position, reward, score)
 
         return score
