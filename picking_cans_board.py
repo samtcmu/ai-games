@@ -27,6 +27,38 @@ CELLS = [
     CELL_WALL,
 ]
 
+class AgentState():
+    def __init__(self, board, r, c):
+        # Contets of the 3x3 matrix returned to represent the current state of
+        # the agent. The current position of the agent is the cell labeled "2".
+        # The cells labeled "0", "1", "3", and "4" represent the cells directly
+        # above, to the left, to the rigth, and directly below respectively.
+        # Cells labeled "-" are not visible to the agent.
+        #  | - | 0 | - |
+        #  | 1 | 2 | 3 |
+        #  | - | 4 | - |
+        self._state = [[None for _ in range(3)] for _ in range(3)]
+        self._state[0][1] = board.GetContents(r - 1, c)
+        self._state[1][0] = board.GetContents(r, c - 1)
+        self._state[1][1] += board.GetContents(r, c)
+        self._state[1][2] += board.GetContents(r, c + 1)
+        self._state[2][1] += board.GetContents(r + 1, c)
+
+    def __int__(self):
+        # Exponent of 2 for each board cell relative to current cell
+        # (where 2 is).
+        #      | 0 |
+        #  | 1 | 2 | 3 |
+        #      | 4 |
+        output = 0
+        output += (len(CELLS) ** 0) * self._state[0][1]
+        output += (len(CELLS) ** 1) * self._state[1][0]
+        output += (len(CELLS) ** 2) * self._state[1][1]
+        output += (len(CELLS) ** 3) * self._state[1][2]
+        output += (len(CELLS) ** 4) * self._state[2][1]
+        return output
+
+
 class Board:
     def __init__(self, rows, columns, board=None):
         self._rows = rows
@@ -104,7 +136,7 @@ class Board:
 
     def BoardPosition(self, r, c):
         # Exponent of 2 for each board position relative to current position
-        # (where 4 is).
+        # (where 2 is).
         #      | 0 |
         #  | 1 | 2 | 3 |
         #      | 4 |
@@ -140,6 +172,9 @@ class Board:
 
     def CurrentBoardPosition(self):
         return self.BoardPosition(self._r, self._c)
+
+    def CurrentAgentState(self):
+        return AgentState(self, self._r, self._c)
 
     def GetContents(self, r, c):
         if (0 <= r < self._rows) and (0 <= c < self._columns):
@@ -196,6 +231,7 @@ class Board:
         score = 0
         all_cans_bonus_reached = False
         for t in range(actions_per_game):
+            # initial_state = self.CurrentBoardState()
             initial_position = self.CurrentBoardPosition()
             action = model.ActionForPosition(initial_position)
             if verbose:

@@ -251,6 +251,9 @@ class ManualModel:
     def __str__(self):
         return str(self._actions)
 
+    def ActionForState(self, state):
+        return self._actions[state]
+
     def ActionForPosition(self, position):
         return self._actions[position]
 
