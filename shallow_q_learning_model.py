@@ -78,17 +78,6 @@ class ShallowQLearningModel(model.Model):
 
         return random.choice(best_actions)
 
-    def ActionForPosition(self, position):
-        if random.random() < self._exploration_rate:
-            # For exploration we pick a random action some of the time.
-            best_actions = [a[0] for a in picking_cans_board.ACTIONS]
-        else:
-            action_values = [self._q_matrix_model.Infer(self._FeatureVector(position, a[0]))
-                             for a in picking_cans_board.ACTIONS]
-            best_actions = MaxIndices(action_values)
-
-        return random.choice(best_actions)
-
     def Update(self, initial_position, action, final_position, reward, score):
         action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_position, a[0]))
                          for a in picking_cans_board.ACTIONS]

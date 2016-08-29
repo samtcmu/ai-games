@@ -44,15 +44,6 @@ class QLearningModel(model.Model):
 
         return random.choice(best_actions)
 
-    def ActionForPosition(self, position):
-        if random.random() < self._exploration_rate:
-            # For exploration we pick a random action some of the time.
-            best_actions = [a[0] for a in picking_cans_board.ACTIONS]
-        else:
-            best_actions = MaxIndices(self._q_matrix[position])
-
-        return random.choice(best_actions)
-
     def Update(self, initial_position, action, final_position, reward, score):
         best_action = MaxIndices(self._q_matrix[final_position])[0]
         self._q_matrix[initial_position][action] = (

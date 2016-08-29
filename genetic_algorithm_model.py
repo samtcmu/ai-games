@@ -49,9 +49,6 @@ class GeneticAlgorithmModel(model.Model):
     def ActionForState(self, state):
         return self._actions[int(state)]
 
-    def ActionForPosition(self, position):
-        return self._actions[position]
-
     def Update(self, initial_position, action, final_position, reward, score):
         # Genetic algorithms do not learn in an online fashion.
         return

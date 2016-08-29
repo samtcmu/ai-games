@@ -28,7 +28,11 @@ CELLS = [
 ]
 
 class AgentState():
-    def __init__(self, board, r, c):
+    def __init__(self, state):
+        self._state = state
+
+    @staticmethod
+    def AgentStateForCell(board, r, c):
         # Contets of the 3x3 matrix returned to represent the current state of
         # the agent. The current position of the agent is the cell labeled "2".
         # The cells labeled "0", "1", "3", and "4" represent the cells directly
@@ -37,12 +41,32 @@ class AgentState():
         #  | - | 0 | - |
         #  | 1 | 2 | 3 |
         #  | - | 4 | - |
-        self._state = [[None for _ in range(3)] for _ in range(3)]
-        self._state[0][1] = board.GetContents(r - 1, c)
-        self._state[1][0] = board.GetContents(r, c - 1)
-        self._state[1][1] = board.GetContents(r, c)
-        self._state[1][2] = board.GetContents(r, c + 1)
-        self._state[2][1] = board.GetContents(r + 1, c)
+        state = [[None for _ in range(3)] for _ in range(3)]
+        state[0][1] = board.GetContents(r - 1, c)
+        state[1][0] = board.GetContents(r, c - 1)
+        state[1][1] = board.GetContents(r, c)
+        state[1][2] = board.GetContents(r, c + 1)
+        state[2][1] = board.GetContents(r + 1, c)
+
+        return AgentState(state)
+
+    @staticmethod
+    def AgentStateForBoardPosition(position):
+        len_cells = len(CELLS)
+
+        # Exponent of 2 for each board position relative to current position
+        # (where 2 is).
+        #  | - | 0 | - |
+        #  | 1 | 2 | 3 |
+        #  | - | 4 | - |
+        state = [[None for _ in range(3)] for _ in range(3)]
+        state[0][1] = (position / (len_cells ** 0)) % len_cells
+        state[1][0] = (position / (len_cells ** 1)) % len_cells
+        state[1][1] = (position / (len_cells ** 2)) % len_cells
+        state[1][2] = (position / (len_cells ** 3)) % len_cells
+        state[2][1] = (position / (len_cells ** 4)) % len_cells
+
+        return AgentState(state)
 
     def __str__(self):
         output = []
@@ -198,7 +222,7 @@ class Board:
         return self.BoardPosition(self._r, self._c)
 
     def CurrentAgentState(self):
-        return AgentState(self, self._r, self._c)
+        return AgentState.AgentStateForCell(self, self._r, self._c)
 
     def GetContents(self, r, c):
         if (0 <= r < self._rows) and (0 <= c < self._columns):

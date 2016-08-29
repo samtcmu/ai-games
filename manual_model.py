@@ -1,6 +1,7 @@
+import model
 import picking_cans_board
 
-class ManualModel:
+class ManualModel(model.Model):
     def __init__(self):
         self._actions = {
             0: picking_cans_board.ACTION_MOVE_RANDOM,
@@ -252,13 +253,7 @@ class ManualModel:
         return str(self._actions)
 
     def ActionForState(self, state):
-        return self._actions[state]
-
-    def ActionForState(self, state):
         return self._actions[int(state)]
-
-    def ActionForPosition(self, position):
-        return self._actions[position]
 
     def Update(self, initial_position, action, final_position, reward, score):
         return
