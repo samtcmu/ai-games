@@ -132,21 +132,24 @@ class Board:
                     random.randrange(len(inner_cells))]
 
         if random_wall:
-            wall_start = [random.randrange(1, self._rows - 1) for _ in range(2)]
-            wall_end = [random.randrange(1, self._rows - 1) for _ in range(2)]
-            while True:
-                self._board[wall_start[0]][wall_start[1]] = CELL_WALL
-                if wall_start == wall_end:
-                    break
-
-                if wall_start[0] != wall_end[0]:
-                    wall_start[0] += ((wall_end[0] - wall_start[0]) /
-                                      abs(wall_end[0] - wall_start[0]))
-                elif wall_start[1] != wall_end[1]:
-                    wall_start[1] += ((wall_end[1] - wall_start[1]) /
-                                      abs(wall_end[1] - wall_start[1]))
+            self.AddRandomWall()
 
         self.SetNumCans()
+
+    def AddRandomWall(self):
+        wall_start = [random.randrange(1, self._rows - 1) for _ in range(2)]
+        wall_end = [random.randrange(1, self._rows - 1) for _ in range(2)]
+        while True:
+            self._board[wall_start[0]][wall_start[1]] = CELL_WALL
+            if wall_start == wall_end:
+                break
+
+            if wall_start[0] != wall_end[0]:
+                wall_start[0] += ((wall_end[0] - wall_start[0]) /
+                                  abs(wall_end[0] - wall_start[0]))
+            elif wall_start[1] != wall_end[1]:
+                wall_start[1] += ((wall_end[1] - wall_start[1]) /
+                                  abs(wall_end[1] - wall_start[1]))
 
     def RandomizeCurrentPosition(self):
         while True:
