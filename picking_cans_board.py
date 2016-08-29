@@ -257,7 +257,7 @@ class Board:
         for t in range(actions_per_game):
             initial_state = self.CurrentAgentState()
             initial_position = self.CurrentBoardPosition()
-            action = model.ActionForPosition(initial_position)
+            action = model.ActionForState(initial_state)
             if verbose:
                 print "time: %d\nscore: %d\n" % (t, score)
                 print self

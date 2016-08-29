@@ -35,6 +35,15 @@ class QLearningModel(model.Model):
         self._q_matrix = pickle.load(model_file)
         model_file.close()
 
+    def ActionForState(self, state):
+        if random.random() < self._exploration_rate:
+            # For exploration we pick a random action some of the time.
+            best_actions = [a[0] for a in picking_cans_board.ACTIONS]
+        else:
+            best_actions = MaxIndices(self._q_matrix[int(state)])
+
+        return random.choice(best_actions)
+
     def ActionForPosition(self, position):
         if random.random() < self._exploration_rate:
             # For exploration we pick a random action some of the time.

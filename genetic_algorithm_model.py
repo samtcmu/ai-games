@@ -46,6 +46,9 @@ class GeneticAlgorithmModel(model.Model):
         self._actions = pickle.load(model_file)
         model_file.close()
 
+    def ActionForState(self, state):
+        return self._actions[int(state)]
+
     def ActionForPosition(self, position):
         return self._actions[position]
 
