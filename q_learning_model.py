@@ -44,14 +44,14 @@ class QLearningModel(model.Model):
 
         return random.choice(best_actions)
 
-    def Update(self, initial_position, action, final_position, reward, score):
-        best_action = MaxIndices(self._q_matrix[final_position])[0]
-        self._q_matrix[initial_position][action] = (
+    def Update(self, initial_state, action, final_state, reward):
+        best_action = MaxIndices(self._q_matrix[int(final_state)])[0]
+        self._q_matrix[int(initial_state)][action] = (
             ((1.0 - self._learning_rate) *
-             self._q_matrix[initial_position][action]) +
+             self._q_matrix[int(initial_state)][action]) +
             (self._learning_rate *
              (reward + (self._discount_rate *
-              self._q_matrix[final_position][best_action]))))
+              self._q_matrix[int(final_state)][best_action]))))
 
 def Train(rows=10, columns=10, random_wall=False, games=200,
           actions_per_game=200, learning_rate=0.1, discount_rate=0.9,

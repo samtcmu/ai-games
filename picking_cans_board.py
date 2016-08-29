@@ -273,7 +273,6 @@ class Board:
             score += reward
 
             final_state = self.CurrentAgentState()
-            model.Update(int(initial_state), action, int(final_state),
-                         reward, score)
+            model.Update(initial_state, action, final_state, reward)
 
         return score

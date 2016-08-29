@@ -255,5 +255,5 @@ class ManualModel(model.Model):
     def ActionForState(self, state):
         return self._actions[int(state)]
 
-    def Update(self, initial_position, action, final_position, reward, score):
+    def Update(self, initial_state, action, final_state, reward):
         return

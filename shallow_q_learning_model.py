@@ -33,20 +33,22 @@ class ShallowQLearningModel(model.Model):
         self._q_matrix_model = pickle.load(model_file)
         model_file.close()
 
-    def _PositionAsArray(self, p):
-        c = len(picking_cans_board.CELLS)
-        output = [0.0 for _ in range(5)]
-        for i in range(5):
-            output[i] = (p / (c**i)) % c
+    def _StateAsArray(self, state):
+        output = [picking_cans_board.CELL_EMPTY for _ in range(5)]
+        output[0] = state.GetContents(0, 1)
+        output[1] = state.GetContents(1, 0)
+        output[2] = state.GetContents(1, 1)
+        output[3] = state.GetContents(1, 2)
+        output[4] = state.GetContents(2, 1)
         return output
 
-    def _FeatureVector(self, position, action):
+    def _FeatureVector(self, state, action):
         feature_vector = []
-        position_array = self._PositionAsArray(position)
+        state_array = self._StateAsArray(state)
 
         # For each of the cells in the position add a categorical feature for
         # each of the possible contents of the cell.
-        for c in position_array:
+        for c in state_array:
             feature = [0.0 for _ in range(len(picking_cans_board.CELLS))]
             feature[int(c)] = 1.0
             feature_vector.append(feature)
@@ -58,7 +60,7 @@ class ShallowQLearningModel(model.Model):
 
         # Add a categorical feature for each combination of position cell, its
         # contents, and action.
-        for c in position_array:
+        for c in state_array:
             feature = [0.0 for _ in range(len(picking_cans_board.ACTIONS) *
                                           len(picking_cans_board.CELLS))]
             feature[int(c) * action] = 1.0
@@ -78,20 +80,20 @@ class ShallowQLearningModel(model.Model):
 
         return random.choice(best_actions)
 
-    def Update(self, initial_position, action, final_position, reward, score):
-        action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_position, a[0]))
+    def Update(self, initial_state, action, final_state, reward):
+        action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_state, a[0]))
                          for a in picking_cans_board.ACTIONS]
         best_action = MaxIndices(action_values)[0]
         updated_q_value = (
             ((1.0 - self._learning_rate) *
-             self._q_matrix_model.Infer(self._FeatureVector(initial_position, action))) +
+             self._q_matrix_model.Infer(self._FeatureVector(initial_state, action))) +
             (self._learning_rate *
              (reward + (self._discount_rate *
               self._q_matrix_model.Infer(self._FeatureVector(
-                  final_position, best_action))))))
+                  final_state, best_action))))))
 
         self._q_matrix_model.Train([
-            [self._FeatureVector(initial_position, action), updated_q_value]],
+            [self._FeatureVector(initial_state, action), updated_q_value]],
             learning_rate=self._linear_regression_learning_rate,
             learning_iterations=1,
             regularization_rate=0.0,

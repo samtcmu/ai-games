@@ -11,7 +11,9 @@ class Model:
         raise Exception, "Model subclasses must implement LoadFromFile."
 
     def ActionForState(self, state):
+        """Returns an action for an input picking_cans_board.AgentState."""
         raise Exception, "Model subclasses must implement ActionForState."
 
-    def Update(self, initial_position, action, final_position, reward, score):
+    def Update(self, initial_state, action, final_state, reward):
+        """Returns an action for an input picking_cans_board.AgentState."""
         raise Exception, "Model subclasses must implement Update."
