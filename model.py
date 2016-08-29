@@ -13,9 +13,5 @@ class Model:
     def ActionForState(self, state):
         raise Exception, "Model subclasses must implement ActionForState."
 
-    def ActionForPosition(self, position):
-        return self.ActionForState(
-            picking_cans_board.AgentState.AgentStateForBoardPosition(position))
-
     def Update(self, initial_position, action, final_position, reward, score):
         raise Exception, "Model subclasses must implement Update."

@@ -196,28 +196,6 @@ class Board:
         position += (len(CELLS) ** 4) * self.GetContents(r + 1, c)
         return position
 
-    def BoardPositionAsString(self, p):
-        output = []
-        c = len(CELLS)
-
-        rows_to_print = [
-            [(p / (c ** 0)) % c],
-            [(p / (c ** 1)) % c, (p / (c ** 2)) % c, (p / (c ** 3)) % c],
-            [(p / (c ** 4)) % c]
-        ]
-
-        for row in rows_to_print:
-            output.append("")
-            if len(row) == 1:
-                output[-1] += "   "
-            for col in row:
-                output[-1] += "|"
-                output[-1] += termcolor.colored(
-                    "  ", on_color=self.ColorForBoardContents(col))
-            output[-1] += "|"
-
-        return "\n".join(output)
-
     def CurrentBoardPosition(self):
         return self.BoardPosition(self._r, self._c)
 

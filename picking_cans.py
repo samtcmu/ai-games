@@ -11,10 +11,12 @@ def manual_algorithm(positions=None, test_model=False):
     board.RandomizeCurrentPosition()
     if positions is not None:
         for position in positions:
+            state = picking_cans_board.AgentState.AgentStateForBoardPosition(
+                position)
             print "position: %d\n" % (position,)
-            print board.BoardPositionAsString(position)
+            print state
             print "action: %s\n" % (
-                picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
+                picking_cans_board.ACTIONS[model.ActionForState(state)][1],)
     elif test_model:
         test_trials=1000
         total_score = 0
@@ -45,15 +47,16 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
         board = picking_cans_board.Board(10, 10)
         models = [genetic_algorithm_model.GeneticAlgorithmModel(
             filename=f) for f in models_to_diff]
-        for i in range(len(picking_cans_board.CELLS)**5):
-            if models[0]._actions[i] != models[1]._actions[i]:
-                print board.BoardPositionAsString(i)
+        for p in range(len(picking_cans_board.CELLS)**5):
+            state = picking_cans_board.AgentState.AgentStateForBoardPosition(p)
+            if models[0]._actions[p] != models[1]._actions[p]:
+                print state
                 print "action[%s]: %s" % (
                     models_to_diff[0],
-                    picking_cans_board.ACTIONS[models[0].ActionForPosition(i)][1],)
+                    picking_cans_board.ACTIONS[models[0].ActionForState(state)][1],)
                 print "action[%s]: %s\n" % (
                     models_to_diff[1],
-                    picking_cans_board.ACTIONS[models[1].ActionForPosition(i)][1],)
+                    picking_cans_board.ACTIONS[models[1].ActionForState(state)][1],)
     else:
         if positions is None:
             model = genetic_algorithm_model.GeneticAlgorithmModel(
@@ -68,10 +71,12 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
                 filename=model_file)
             board = picking_cans_board.Board(10, 10)
             for position in positions:
+                state = picking_cans_board.AgentState.AgentStateForBoardPosition(
+                    position)
                 print "position: %d\n" % (position,)
-                print board.BoardPositionAsString(position)
+                print state
                 print "action: %s\n" % (
-                    picking_cans_board.ACTIONS[model.ActionForPosition(position)][1],)
+                    picking_cans_board.ACTIONS[model.ActionForState(state)][1],)
 
 def q_learning(train_model=True, model_file=None, random_wall=False):
     if train_model:
