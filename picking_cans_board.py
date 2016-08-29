@@ -132,13 +132,6 @@ class Board:
             output += "|\n"
         return output
 
-    def SetNumCans(self):
-        self._num_cans = 0
-        for r in range(self._rows):
-            for c in range(self._columns):
-                if self.ContainsCan(r, c):
-                    self._num_cans += 1
-
     @staticmethod
     def ColorForBoardContents(contents):
         colors = {
@@ -147,6 +140,13 @@ class Board:
             CELL_WALL: "on_cyan",
         }
         return colors[contents]
+
+    def SetNumCans(self):
+        self._num_cans = 0
+        for r in range(self._rows):
+            for c in range(self._columns):
+                if self.ContainsCan(r, c):
+                    self._num_cans += 1
 
     def Randomize(self, random_wall=False):
         inner_cells = [CELL_EMPTY, CELL_CONTAINS_CAN]
@@ -181,23 +181,6 @@ class Board:
             self._c = random.randint(0, self._columns - 1)
             if not self.ContainsWall(self._r, self._c):
                 break
-
-    def BoardPosition(self, r, c):
-        # Exponent of 2 for each board position relative to current position
-        # (where 2 is).
-        #      | 0 |
-        #  | 1 | 2 | 3 |
-        #      | 4 |
-        position = 0
-        position += (len(CELLS) ** 0) * self.GetContents(r - 1, c)
-        position += (len(CELLS) ** 1) * self.GetContents(r, c - 1)
-        position += (len(CELLS) ** 2) * self.GetContents(r, c)
-        position += (len(CELLS) ** 3) * self.GetContents(r, c + 1)
-        position += (len(CELLS) ** 4) * self.GetContents(r + 1, c)
-        return position
-
-    def CurrentBoardPosition(self):
-        return self.BoardPosition(self._r, self._c)
 
     def CurrentAgentState(self):
         return AgentState.AgentStateForCell(self, self._r, self._c)
@@ -258,7 +241,6 @@ class Board:
         all_cans_bonus_reached = False
         for t in range(actions_per_game):
             initial_state = self.CurrentAgentState()
-            initial_position = self.CurrentBoardPosition()
             action = model.ActionForState(initial_state)
             if verbose:
                 print "time: %d\nscore: %d\n" % (t, score)
@@ -290,8 +272,8 @@ class Board:
 
             score += reward
 
-            final_position = self.CurrentBoardPosition()
             final_state = self.CurrentAgentState()
-            model.Update(initial_position, action, final_position, reward, score)
+            model.Update(int(initial_state), action, int(final_state),
+                         reward, score)
 
         return score
