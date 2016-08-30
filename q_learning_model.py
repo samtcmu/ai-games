@@ -1,3 +1,4 @@
+import default_agent_state
 import model
 import picking_cans_board
 import pickle
@@ -5,7 +6,8 @@ import random
 
 class QLearningModel(model.Model):
     def __init__(self, learning_rate=0.1, discount_rate=1.0,
-                 exploration_rate=0.1, filename=None):
+                 exploration_rate=0.1, filename=None,
+                 agent_state_class=default_agent_state.DefaultAgentState):
         self._learning_rate = learning_rate
         self._discount_rate = discount_rate
         self._exploration_rate = exploration_rate
@@ -14,7 +16,8 @@ class QLearningModel(model.Model):
         else:
             self._q_matrix = [
                 [0.0 for _ in picking_cans_board.ACTIONS]
-                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
+                for _ in range(agent_state_class.NumberOfStates())]
+        self._agent_state_class = agent_state_class
 
     def __str__(self):
         output = ""

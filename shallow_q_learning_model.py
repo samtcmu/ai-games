@@ -1,3 +1,4 @@
+import default_agent_state
 import linear_regression
 import model
 import picking_cans_board
@@ -7,16 +8,18 @@ import random
 class ShallowQLearningModel(model.Model):
     def __init__(self, learning_rate=1.0, discount_rate=1.0,
                  exploration_rate=0.1, linear_regression_learning_rate=0.1,
+                 agent_state_class=default_agent_state.DefaultAgentState,
                  filename=None):
         self._learning_rate = learning_rate
         self._discount_rate = discount_rate
         self._exploration_rate = exploration_rate
         self._linear_regression_learning_rate = linear_regression_learning_rate
+        self._agent_state_class = agent_state_class
         if filename:
             self.LoadFromFile(filename)
         else:
             number_of_visible_cells = (
-                picking_cans_board.AgentState.NumberOfVisibleCells())
+                self._agent_state_class.NumberOfVisibleCells())
             self._q_matrix_model = linear_regression.LinearRegression(
                 (len(picking_cans_board.CELLS) * number_of_visible_cells) +
                 len(picking_cans_board.ACTIONS) +

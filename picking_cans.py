@@ -1,6 +1,8 @@
+# This must be imported first.
+import picking_cans_board
+
 import genetic_algorithm_model
 import manual_model
-import picking_cans_board
 import q_learning_model
 import shallow_q_learning_model
 

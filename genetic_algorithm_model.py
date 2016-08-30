@@ -1,3 +1,4 @@
+import default_agent_state
 import model
 import picking_cans_board
 import pickle
@@ -5,13 +6,15 @@ import random
 
 class GeneticAlgorithmModel(model.Model):
     def __init__(self, filename=None, randomize=False, parents=None,
-                 mutation_rate=0.005):
+                 mutation_rate=0.005,
+                 agent_state_class=default_agent_state.DefaultAgentState):
         self._mutation_rate = mutation_rate
+        self._agent_state_class = agent_state_class
 
         if parents is not None:
             self._actions = [
                 picking_cans_board.ACTION_UP
-                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
+                for _ in range(self._agent_state_class.NumberOfStates())]
             for i in range(len(self._actions)):
                 self._actions[i] = (
                     random.choice(parents)._actions[i])
@@ -23,14 +26,14 @@ class GeneticAlgorithmModel(model.Model):
         elif filename is None:
             self._actions = [
                 picking_cans_board.ACTION_UP
-                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
+                for _ in range(self._agent_state_class.NumberOfStates())]
             if randomize:
                 self.Randomize()
         else:
             self.LoadFromFile(filename)
 
     def Randomize(self):
-        for i in range(picking_cans_board.AgentState.NumberOfStates()):
+        for i in range(self._agent_state_class.NumberOfStates()):
             self._actions[i] = random.choice(picking_cans_board.ACTIONS)[0]
 
     def __str__(self):

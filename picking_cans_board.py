@@ -1,3 +1,4 @@
+import default_agent_state
 import random
 import termcolor
 
@@ -27,97 +28,9 @@ CELLS = [
     CELL_WALL,
 ]
 
-class AgentState():
-    def __init__(self, state):
-        self._state = state
-
-    @staticmethod
-    def AgentStateForCell(board, r, c):
-        # Contets of the 3x3 matrix returned to represent the current state of
-        # the agent. The current position of the agent is the cell labeled "2".
-        # The cells labeled "0", "1", "3", and "4" represent the cells directly
-        # above, to the left, to the rigth, and directly below respectively.
-        # Cells labeled "-" are not visible to the agent.
-        #  | - | 0 | - |
-        #  | 1 | 2 | 3 |
-        #  | - | 4 | - |
-        state = [[None for _ in range(3)] for _ in range(3)]
-        state[0][1] = board.GetContents(r - 1, c)
-        state[1][0] = board.GetContents(r, c - 1)
-        state[1][1] = board.GetContents(r, c)
-        state[1][2] = board.GetContents(r, c + 1)
-        state[2][1] = board.GetContents(r + 1, c)
-
-        return AgentState(state)
-
-    @staticmethod
-    def AgentStateForBoardPosition(position):
-        len_cells = len(CELLS)
-
-        # Exponent of 2 for each board position relative to current position
-        # (where 2 is).
-        #  | - | 0 | - |
-        #  | 1 | 2 | 3 |
-        #  | - | 4 | - |
-        state = [[None for _ in range(3)] for _ in range(3)]
-        state[0][1] = (position / (len_cells ** 0)) % len_cells
-        state[1][0] = (position / (len_cells ** 1)) % len_cells
-        state[1][1] = (position / (len_cells ** 2)) % len_cells
-        state[1][2] = (position / (len_cells ** 3)) % len_cells
-        state[2][1] = (position / (len_cells ** 4)) % len_cells
-
-        return AgentState(state)
-
-    @staticmethod
-    def NumberOfVisibleCells():
-        # The agent can view the numbered cells relative to its current
-        # location (cell labeled 2).
-        #  | - | 0 | - |
-        #  | 1 | 2 | 3 |
-        #  | - | 4 | - |
-        return 5
-
-    @staticmethod
-    def NumberOfStates():
-        return len(CELLS)**NumberOfVisibleCells()
-
-    def __str__(self):
-        output = []
-        for row in self._state:
-            output.append([])
-            for cell in row:
-                if cell is not None:
-                    output[-1].append(termcolor.colored(
-                        "  ", on_color=Board.ColorForBoardContents(cell)))
-                else:
-                    output[-1].append("  ")
-
-            # Handle placing the separators.
-            output[-1] = (("|" if row[0] is not None else " ") +
-                          "|".join(output[-1]) +
-                          ("|" if row[-1] is not None else " "))
-
-        return "\n".join(output)
-
-    def __int__(self):
-        # Exponent of 2 for each board cell relative to current cell
-        # (where 2 is).
-        #      | 0 |
-        #  | 1 | 2 | 3 |
-        #      | 4 |
-        output = 0
-        output += (len(CELLS) ** 0) * self._state[0][1]
-        output += (len(CELLS) ** 1) * self._state[1][0]
-        output += (len(CELLS) ** 2) * self._state[1][1]
-        output += (len(CELLS) ** 3) * self._state[1][2]
-        output += (len(CELLS) ** 4) * self._state[2][1]
-        return output
-
-    def GetContents(self, r, c):
-        return self._state[r][c]
-
 class Board:
-    def __init__(self, rows, columns, board=None):
+    def __init__(self, rows, columns, board=None,
+                 agent_state_class=default_agent_state.DefaultAgentState):
         self._rows = rows
         self._columns = columns
         if board is None:
@@ -131,6 +44,8 @@ class Board:
         # Count the number of cans initially on the board.
         self._num_cans = 0
         self.SetNumCans()
+
+        self._agent_state_class = agent_state_class
 
     def __str__(self):
         output = ""
@@ -196,7 +111,7 @@ class Board:
                 break
 
     def CurrentAgentState(self):
-        return AgentState.AgentStateForCell(self, self._r, self._c)
+        return self._agent_state_class.AgentStateForCell(self, self._r, self._c)
 
     def GetContents(self, r, c):
         if (0 <= r < self._rows) and (0 <= c < self._columns):
