@@ -17,7 +17,7 @@ class GeneticAlgorithmModel(model.Model):
                     random.choice(parents)._actions[i])
                 self._actions[i] = (
                     (self._actions[i] +
-                     ((1 if random.random() < 0.005 else 0) *
+                     ((1 if random.random() < self._mutation_rate else 0) *
                        random.choice(picking_cans_board.ACTIONS)[0])) %
                     len(picking_cans_board.ACTIONS))
         elif filename is None:
