@@ -15,9 +15,13 @@ class ShallowQLearningModel(model.Model):
         if filename:
             self.LoadFromFile(filename)
         else:
+            number_of_visible_cells = (
+                picking_cans_board.AgentState.NumberOfVisibleCells())
             self._q_matrix_model = linear_regression.LinearRegression(
-                (len(picking_cans_board.CELLS) * 5) + len(picking_cans_board.ACTIONS) +
-                (len(picking_cans_board.CELLS) * len(picking_cans_board.ACTIONS) * 5))
+                (len(picking_cans_board.CELLS) * number_of_visible_cells) +
+                len(picking_cans_board.ACTIONS) +
+                (len(picking_cans_board.CELLS) * len(picking_cans_board.ACTIONS) *
+                 number_of_visible_cells))
             self._q_matrix_model.RandomizeWeights(random_range=(-1.0, 1.0))
 
     def __str__(self):

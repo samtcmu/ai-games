@@ -11,7 +11,7 @@ class GeneticAlgorithmModel(model.Model):
         if parents is not None:
             self._actions = [
                 picking_cans_board.ACTION_UP
-                for _ in range(len(picking_cans_board.CELLS) ** 5)]
+                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
             for i in range(len(self._actions)):
                 self._actions[i] = (
                     random.choice(parents)._actions[i])
@@ -23,14 +23,14 @@ class GeneticAlgorithmModel(model.Model):
         elif filename is None:
             self._actions = [
                 picking_cans_board.ACTION_UP
-                for _ in range(len(picking_cans_board.CELLS) ** 5)]
+                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
             if randomize:
                 self.Randomize()
         else:
             self.LoadFromFile(filename)
 
     def Randomize(self):
-        for i in range(len(picking_cans_board.CELLS) ** 5):
+        for i in range(picking_cans_board.AgentState.NumberOfStates()):
             self._actions[i] = random.choice(picking_cans_board.ACTIONS)[0]
 
     def __str__(self):

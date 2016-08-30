@@ -14,7 +14,7 @@ class QLearningModel(model.Model):
         else:
             self._q_matrix = [
                 [0.0 for _ in picking_cans_board.ACTIONS]
-                for _ in range(len(picking_cans_board.CELLS) ** 5)]
+                for _ in range(picking_cans_board.AgentState.NumberOfStates())]
 
     def __str__(self):
         output = ""

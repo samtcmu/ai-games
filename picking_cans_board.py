@@ -68,6 +68,19 @@ class AgentState():
 
         return AgentState(state)
 
+    @staticmethod
+    def NumberOfVisibleCells():
+        # The agent can view the numbered cells relative to its current
+        # location (cell labeled 2).
+        #  | - | 0 | - |
+        #  | 1 | 2 | 3 |
+        #  | - | 4 | - |
+        return 5
+
+    @staticmethod
+    def NumberOfStates():
+        return len(CELLS)**NumberOfVisibleCells()
+
     def __str__(self):
         output = []
         for row in self._state:
