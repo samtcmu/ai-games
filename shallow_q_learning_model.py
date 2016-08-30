@@ -34,12 +34,12 @@ class ShallowQLearningModel(model.Model):
         model_file.close()
 
     def _StateAsArray(self, state):
-        output = [picking_cans_board.CELL_EMPTY for _ in range(5)]
-        output[0] = state.GetContents(0, 1)
-        output[1] = state.GetContents(1, 0)
-        output[2] = state.GetContents(1, 1)
-        output[3] = state.GetContents(1, 2)
-        output[4] = state.GetContents(2, 1)
+        output = []
+        for r in range(3):
+            for c in range(3):
+                cell_contents = state.GetContents(r, c)
+                if cell_contents is not None:
+                    output.append(cell_contents)
         return output
 
     def _FeatureVector(self, state, action):
