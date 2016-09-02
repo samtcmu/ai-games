@@ -1,6 +1,8 @@
 # This must be imported first.
 import picking_cans_board
 
+import radius_one_agent_state
+
 import genetic_algorithm_model
 import manual_model
 import q_learning_model
@@ -90,9 +92,10 @@ def q_learning(train_model=True, model_file=None, random_wall=False):
             actions_per_game=200,
             learning_rate=0.2,
             discount_rate=0.9,
-            exploration_rate=0.002,
+            exploration_rate=0.01,
             model_save_frequency=1000,
             model_file_prefix="output/ql-model/ql-model",
+            agent_state_class=radius_one_agent_state.RadiusOneAgentState,
             verbose=True)
     else:
         if model_file:
@@ -100,13 +103,16 @@ def q_learning(train_model=True, model_file=None, random_wall=False):
                 learning_rate=0.1,
                 discount_rate=1.0,
                 exploration_rate=0.0,
-                filename=model_file)
+                filename=model_file,
+                agent_state_class=radius_one_agent_state.RadiusOneAgentState)
         else:
             model = q_learning_model.QLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
-                exploration_rate=0.0)
-        board = picking_cans_board.Board(10, 10)
+                exploration_rate=0.0,
+                agent_state_class=radius_one_agent_state.RadiusOneAgentState)
+        board = picking_cans_board.Board(10, 10,
+            agent_state_class=radius_one_agent_state.RadiusOneAgentState)
         board.Randomize(random_wall=random_wall)
         board.RandomizeCurrentPosition()
         print "score: %d" % (board.PickCansWithModel(
