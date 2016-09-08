@@ -2,11 +2,22 @@
 import picking_cans_board
 
 import default_agent_state
+import radius_one_agent_state
 
 import genetic_algorithm_model
 import manual_model
 import q_learning_model
 import shallow_q_learning_model
+
+def GetAgentStateClass(agent_state_type):
+    agent_state_classes = {
+        "default": default_agent_state.DefaultAgentState,
+        "radius-one": radius_one_agent_state.RadiusOneAgentState,
+    }
+    try:
+        return agent_state_classes[agent_state_type]
+    except KeyError:
+        raise KeyError, "invalid agent_state_type: %s" % (agent_state_type,)
 
 def manual_algorithm(positions=None, test_model=False):
     model = manual_model.ManualModel()
@@ -83,7 +94,9 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
                     picking_cans_board.ACTIONS[model.ActionForState(state)][1],)
 
 def q_learning(train_model=True, model_file=None, random_wall=False,
-               agent_state_class=default_agent_state.DefaultAgentState):
+               agent_state_type="default"):
+    agent_state_class = GetAgentStateClass(agent_state_type)
+
     if train_model:
         q_learning_model.Train(
             rows=10,
