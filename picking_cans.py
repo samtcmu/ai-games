@@ -1,7 +1,7 @@
 # This must be imported first.
 import picking_cans_board
 
-import radius_one_agent_state
+import default_agent_state
 
 import genetic_algorithm_model
 import manual_model
@@ -82,7 +82,8 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
                 print "action: %s\n" % (
                     picking_cans_board.ACTIONS[model.ActionForState(state)][1],)
 
-def q_learning(train_model=True, model_file=None, random_wall=False):
+def q_learning(train_model=True, model_file=None, random_wall=False,
+               agent_state_class=default_agent_state.DefaultAgentState):
     if train_model:
         q_learning_model.Train(
             rows=10,
@@ -95,7 +96,7 @@ def q_learning(train_model=True, model_file=None, random_wall=False):
             exploration_rate=0.01,
             model_save_frequency=1000,
             model_file_prefix="output/ql-model/ql-model",
-            agent_state_class=radius_one_agent_state.RadiusOneAgentState,
+            agent_state_class=agent_state_class,
             verbose=True)
     else:
         if model_file:
@@ -104,15 +105,15 @@ def q_learning(train_model=True, model_file=None, random_wall=False):
                 discount_rate=1.0,
                 exploration_rate=0.0,
                 filename=model_file,
-                agent_state_class=radius_one_agent_state.RadiusOneAgentState)
+                agent_state_class=agent_state_class)
         else:
             model = q_learning_model.QLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
                 exploration_rate=0.0,
-                agent_state_class=radius_one_agent_state.RadiusOneAgentState)
+                agent_state_class=agent_state_class)
         board = picking_cans_board.Board(10, 10,
-            agent_state_class=radius_one_agent_state.RadiusOneAgentState)
+            agent_state_class=agent_state_class)
         board.Randomize(random_wall=random_wall)
         board.RandomizeCurrentPosition()
         print "score: %d" % (board.PickCansWithModel(
