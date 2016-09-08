@@ -132,7 +132,10 @@ def q_learning(train_model=True, model_file=None, random_wall=False,
         print "score: %d" % (board.PickCansWithModel(
             model, actions_per_game=200, verbose=True),)
 
-def shallow_q_learning(train_model=True, model_file=None, random_wall=False):
+def shallow_q_learning(train_model=True, model_file=None, random_wall=False,
+                       agent_state_type="default"):
+    agent_state_class = GetAgentStateClass(agent_state_type)
+
     if train_model:
         shallow_q_learning_model.Train(
             rows=10,
@@ -142,10 +145,11 @@ def shallow_q_learning(train_model=True, model_file=None, random_wall=False):
             actions_per_game=200,
             learning_rate=0.2,
             discount_rate=0.9,
-            exploration_rate=0.1,
+            exploration_rate=0.05,
             linear_regression_learning_rate=0.1,
             model_save_frequency=100,
             model_file_prefix="output/sql-model/sql-model",
+            agent_state_class=agent_state_class,
             verbose=True)
     else:
         if model_file:
@@ -154,13 +158,16 @@ def shallow_q_learning(train_model=True, model_file=None, random_wall=False):
                 discount_rate=1.0,
                 exploration_rate=0.0,
                 linear_regression_learning_rate=0.0000005,
-                filename=model_file)
+                filename=model_file,
+                agent_state_class=agent_state_class)
         else:
             model = shallow_q_learning_model.ShallowQLearningModel(
                 learning_rate=0.1,
                 discount_rate=1.0,
-                exploration_rate=0.0)
-        board = picking_cans_board.Board(10, 10)
+                exploration_rate=0.0,
+                agent_state_class=agent_state_class)
+        board = picking_cans_board.Board(
+            10, 10, agent_state_class=agent_state_class)
         board.Randomize(random_wall=random_wall)
         board.RandomizeCurrentPosition()
         print "score: %d" % (board.PickCansWithModel(
