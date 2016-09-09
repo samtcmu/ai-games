@@ -15,7 +15,8 @@ class DefaultAgentState():
         #  | - | 0 | - |
         #  | 1 | 2 | 3 |
         #  | - | 4 | - |
-        state = [[None for _ in range(3)] for _ in range(3)]
+        diameter = DefaultAgentState.VisibleDiameter()
+        state = [[None for _ in range(diameter)] for _ in range(diameter)]
         state[0][1] = board.GetContents(r - 1, c)
         state[1][0] = board.GetContents(r, c - 1)
         state[1][1] = board.GetContents(r, c)
@@ -33,7 +34,8 @@ class DefaultAgentState():
         #  | - | 0 | - |
         #  | 1 | 2 | 3 |
         #  | - | 4 | - |
-        state = [[None for _ in range(3)] for _ in range(3)]
+        diameter = DefaultAgentState.VisibleDiameter()
+        state = [[None for _ in range(diameter)] for _ in range(diameter)]
         state[0][1] = (position / (len_cells ** 0)) % len_cells
         state[1][0] = (position / (len_cells ** 1)) % len_cells
         state[1][1] = (position / (len_cells ** 2)) % len_cells
@@ -41,6 +43,14 @@ class DefaultAgentState():
         state[2][1] = (position / (len_cells ** 4)) % len_cells
 
         return DefaultAgentState(state)
+
+    @staticmethod
+    def VisibleRadius():
+        return 1
+
+    @staticmethod
+    def VisibleDiameter():
+        return (2 * DefaultAgentState.VisibleRadius()) + 1
 
     @staticmethod
     def NumberOfVisibleCells():

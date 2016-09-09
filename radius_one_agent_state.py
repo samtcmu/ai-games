@@ -9,13 +9,11 @@ class RadiusOneAgentState():
     def AgentStateForCell(board, r, c):
         # Contets of the 3x3 matrix returned to represent the current state of
         # the agent. The current position of the agent is the cell labeled "2".
-        # The cells labeled "0", "1", "3", and "4" represent the cells directly
-        # above, to the left, to the rigth, and directly below respectively.
-        # Cells labeled "-" are not visible to the agent.
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
-        state = [[None for _ in range(3)] for _ in range(3)]
+        diameter = RadiusOneAgentState.VisibleDiameter()
+        state = [[None for _ in range(diameter)] for _ in range(diameter)]
         state[0][0] = board.GetContents(r - 1, c - 1)
         state[0][1] = board.GetContents(r - 1, c)
         state[0][2] = board.GetContents(r - 1, c + 1)
@@ -37,7 +35,8 @@ class RadiusOneAgentState():
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
-        state = [[None for _ in range(3)] for _ in range(3)]
+        diameter = RadiusOneAgentState.VisibleDiameter()
+        state = [[None for _ in range(diameter)] for _ in range(diameter)]
         state[0][0] = (position / (len_cells ** 0)) % len_cells
         state[0][1] = (position / (len_cells ** 1)) % len_cells
         state[0][2] = (position / (len_cells ** 2)) % len_cells
@@ -51,13 +50,21 @@ class RadiusOneAgentState():
         return RadiusOneAgentState(state)
 
     @staticmethod
+    def VisibleRadius():
+        return 1
+
+    @staticmethod
+    def VisibleDiameter():
+        return (2 * RadiusOneAgentState.VisibleRadius()) + 1
+
+    @staticmethod
     def NumberOfVisibleCells():
         # The agent can view the numbered cells relative to its current
         # location (cell labeled 2).
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
-        return 9
+        return RadiusOneAgentState.VisibleDiameter()**2
 
     @staticmethod
     def NumberOfStates():

@@ -42,8 +42,9 @@ class ShallowQLearningModel(model.Model):
 
     def _StateAsArray(self, state):
         output = []
-        for r in range(3):
-            for c in range(3):
+        diameter = self._agent_state_class.VisibleDiameter()
+        for r in range(diameter):
+            for c in range(diameter):
                 cell_contents = state.GetContents(r, c)
                 if cell_contents is not None:
                     output.append(cell_contents)
