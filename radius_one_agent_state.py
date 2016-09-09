@@ -12,18 +12,13 @@ class RadiusOneAgentState():
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
+        radius = RadiusOneAgentState.VisibleRadius()
         diameter = RadiusOneAgentState.VisibleDiameter()
         state = [[None for _ in range(diameter)] for _ in range(diameter)]
-        state[0][0] = board.GetContents(r - 1, c - 1)
-        state[0][1] = board.GetContents(r - 1, c)
-        state[0][2] = board.GetContents(r - 1, c + 1)
-        state[1][0] = board.GetContents(r, c - 1)
-        state[1][1] = board.GetContents(r, c)
-        state[1][2] = board.GetContents(r, c + 1)
-        state[2][0] = board.GetContents(r + 1, c - 1)
-        state[2][1] = board.GetContents(r + 1, c)
-        state[2][2] = board.GetContents(r + 1, c + 1)
-
+        for i in range(diameter):
+            for j in range(diameter):
+                state[i][j] = board.GetContents((r - radius) + i,
+                                                (c - radius) + j)
         return RadiusOneAgentState(state)
 
     @staticmethod
@@ -37,16 +32,10 @@ class RadiusOneAgentState():
         #  | 6 | 7 | 8 |
         diameter = RadiusOneAgentState.VisibleDiameter()
         state = [[None for _ in range(diameter)] for _ in range(diameter)]
-        state[0][0] = (position / (len_cells ** 0)) % len_cells
-        state[0][1] = (position / (len_cells ** 1)) % len_cells
-        state[0][2] = (position / (len_cells ** 2)) % len_cells
-        state[1][0] = (position / (len_cells ** 3)) % len_cells
-        state[1][1] = (position / (len_cells ** 4)) % len_cells
-        state[1][2] = (position / (len_cells ** 5)) % len_cells
-        state[2][0] = (position / (len_cells ** 6)) % len_cells
-        state[2][1] = (position / (len_cells ** 7)) % len_cells
-        state[2][2] = (position / (len_cells ** 8)) % len_cells
-
+        for i in range(diameter):
+            for j in range(diameter):
+                exponent = (diameter * i) + j
+                state[i][j] = (position / (len_cells ** exponent)) % len_cells
         return RadiusOneAgentState(state)
 
     @staticmethod
@@ -97,16 +86,13 @@ class RadiusOneAgentState():
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
+        diameter = RadiusOneAgentState.VisibleDiameter()
         output = 0
-        output += (len(picking_cans_board.CELLS) ** 0) * self._state[0][0]
-        output += (len(picking_cans_board.CELLS) ** 1) * self._state[0][1]
-        output += (len(picking_cans_board.CELLS) ** 2) * self._state[0][2]
-        output += (len(picking_cans_board.CELLS) ** 3) * self._state[1][0]
-        output += (len(picking_cans_board.CELLS) ** 4) * self._state[1][1]
-        output += (len(picking_cans_board.CELLS) ** 5) * self._state[1][2]
-        output += (len(picking_cans_board.CELLS) ** 6) * self._state[2][0]
-        output += (len(picking_cans_board.CELLS) ** 7) * self._state[2][1]
-        output += (len(picking_cans_board.CELLS) ** 8) * self._state[2][2]
+        for i in range(diameter):
+            for j in range(diameter):
+                exponent = (diameter * i) + j
+                output += ((len(picking_cans_board.CELLS) ** exponent) *
+                           self._state[i][j])
         return output
 
     def GetContents(self, r, c):
