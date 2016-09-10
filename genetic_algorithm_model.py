@@ -59,10 +59,13 @@ class GeneticAlgorithmModel(model.Model):
 
 def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
           actions_per_game=200, mutation_rate=0.005, model_file_prefix=None,
+          agent_state_class=default_agent_state.DefaultAgentState,
           verbose=False):
-    board = picking_cans_board.Board(rows, columns)
+    board = picking_cans_board.Board(
+        rows, columns, agent_state_class=agent_state_class)
     population = [
-        GeneticAlgorithmModel(randomize=True, mutation_rate=mutation_rate)
+        GeneticAlgorithmModel(randomize=True, mutation_rate=mutation_rate,
+                              agent_state_class=agent_state_class)
         for _ in range(population_size)]
     fittest = None
     for g in range(generations):
@@ -85,7 +88,8 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
 
         fittest = (population[max_index], population[second_max_index])
         population = [
-            GeneticAlgorithmModel(parents=fittest, mutation_rate=mutation_rate)
+            GeneticAlgorithmModel(parents=fittest, mutation_rate=mutation_rate,
+                                  agent_state_class=agent_state_class)
             for _ in range(len(population))]
         if verbose:
             print "generation: %d" % (g,)

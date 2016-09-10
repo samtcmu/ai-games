@@ -46,7 +46,10 @@ def manual_algorithm(positions=None, test_model=False):
         print "score: %d" % (board.PickCansWithModel(
             model, actions_per_game=200, verbose=True),)
 
-def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
+def genetic_algorithm(model_file=None, positions=None, models_to_diff=None,
+                      agent_state_type="default"):
+    agent_state_class = GetAgentStateClass(agent_state_type)
+
     if (model_file is None) and (models_to_diff is None):
         genetic_algorithm_model.Train(
             rows=10,
@@ -57,13 +60,15 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
             actions_per_game=200,
             mutation_rate=0.005,
             model_file_prefix="output/ga-model/ga-model",
+            agent_state_class=agent_state_class,
             verbose=True)
     elif models_to_diff:
-        board = picking_cans_board.Board(10, 10)
+        board = picking_cans_board.Board(
+                10, 10, agent_state_class=agent_state_class)
         models = [genetic_algorithm_model.GeneticAlgorithmModel(
-            filename=f) for f in models_to_diff]
-        for p in range(len(picking_cans_board.CELLS)**5):
-            state = picking_cans_board.AgentState.AgentStateForBoardPosition(p)
+            filename=f, agent_state_class=agent_state_class) for f in models_to_diff]
+        for p in range(agent_state_class.NumberOfStates()):
+            state = agent_state_class.AgentStateForBoardPosition(p)
             if models[0]._actions[p] != models[1]._actions[p]:
                 print state
                 print "action[%s]: %s" % (
@@ -75,18 +80,20 @@ def genetic_algorithm(model_file=None, positions=None, models_to_diff=None):
     else:
         if positions is None:
             model = genetic_algorithm_model.GeneticAlgorithmModel(
-                filename=model_file)
-            board = picking_cans_board.Board(10, 10)
+                filename=model_file, agent_state_class=agent_state_class)
+            board = picking_cans_board.Board(
+                10, 10, agent_state_class=agent_state_class)
             board.Randomize()
             board.RandomizeCurrentPosition()
             print "score: %d" % (board.PickCansWithModel(
                 model, actions_per_game=200, verbose=True),)
         else:
             model = genetic_algorithm_model.GeneticAlgorithmModel(
-                filename=model_file)
-            board = picking_cans_board.Board(10, 10)
+                filename=model_file, agent_state_class=agent_state_class)
+            board = picking_cans_board.Board(
+                10, 10, agent_state_class=agent_state_class)
             for position in positions:
-                state = picking_cans_board.AgentState.AgentStateForBoardPosition(
+                state = agent_state_class.AgentStateForBoardPosition(
                     position)
                 print "position: %d\n" % (position,)
                 print state
