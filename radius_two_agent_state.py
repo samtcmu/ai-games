@@ -1,64 +1,55 @@
 import picking_cans_board
 import termcolor
 
-class RadiusOneAgentState():
+class RadiusTwoAgentState():
     def __init__(self, state):
         self._state = state
 
     @staticmethod
     def AgentStateForCell(board, r, c):
-        # Contets of the 3x3 matrix returned to represent the current state of
-        # the agent. The current position of the agent is the cell labeled "4".
+        # Contets of the dxd matrix returned to represent the current state of
+        # the agent. The current position of the agent is in index
+        # (radius, radius).
         #  | 0 | 1 | 2 |
         #  | 3 | 4 | 5 |
         #  | 6 | 7 | 8 |
-        radius = RadiusOneAgentState.VisibleRadius()
-        diameter = RadiusOneAgentState.VisibleDiameter()
+        radius = RadiusTwoAgentState.VisibleRadius()
+        diameter = RadiusTwoAgentState.VisibleDiameter()
         state = [[None for _ in range(diameter)] for _ in range(diameter)]
         for i in range(diameter):
             for j in range(diameter):
                 state[i][j] = board.GetContents((r - radius) + i,
                                                 (c - radius) + j)
-        return RadiusOneAgentState(state)
+        return RadiusTwoAgentState(state)
 
     @staticmethod
     def AgentStateForBoardPosition(position):
         len_cells = len(picking_cans_board.CELLS)
 
-        # Exponent of 2 for each board position relative to current position
-        # (where 4 is).
-        #  | 0 | 1 | 2 |
-        #  | 3 | 4 | 5 |
-        #  | 6 | 7 | 8 |
-        diameter = RadiusOneAgentState.VisibleDiameter()
+        diameter = RadiusTwoAgentState.VisibleDiameter()
         state = [[None for _ in range(diameter)] for _ in range(diameter)]
         for i in range(diameter):
             for j in range(diameter):
                 exponent = (diameter * i) + j
                 state[i][j] = (position / (len_cells ** exponent)) % len_cells
-        return RadiusOneAgentState(state)
+        return RadiusTwoAgentState(state)
 
     @staticmethod
     def VisibleRadius():
-        return 1
+        return 2
 
     @staticmethod
     def VisibleDiameter():
-        return (2 * RadiusOneAgentState.VisibleRadius()) + 1
+        return (2 * RadiusTwoAgentState.VisibleRadius()) + 1
 
     @staticmethod
     def NumberOfVisibleCells():
-        # The agent can view the numbered cells relative to its current
-        # location (cell labeled 4).
-        #  | 0 | 1 | 2 |
-        #  | 3 | 4 | 5 |
-        #  | 6 | 7 | 8 |
-        return RadiusOneAgentState.VisibleDiameter()**2
+        return RadiusTwoAgentState.VisibleDiameter()**2
 
     @staticmethod
     def NumberOfStates():
         return (len(picking_cans_board.CELLS)**
-                RadiusOneAgentState.NumberOfVisibleCells())
+                RadiusTwoAgentState.NumberOfVisibleCells())
 
     def __str__(self):
         output = []
@@ -81,12 +72,7 @@ class RadiusOneAgentState():
         return "\n".join(output)
 
     def __int__(self):
-        # Exponent of 2 for each board cell relative to current cell
-        # (where 4 is).
-        #  | 0 | 1 | 2 |
-        #  | 3 | 4 | 5 |
-        #  | 6 | 7 | 8 |
-        diameter = RadiusOneAgentState.VisibleDiameter()
+        diameter = RadiusTwoAgentState.VisibleDiameter()
         output = 0
         for i in range(diameter):
             for j in range(diameter):
