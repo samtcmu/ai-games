@@ -76,6 +76,7 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
                 scores[p] += score
             scores[p] /= games
 
+        average_score = list_util.Mean(scores)
         max_index = list_util.MaxIndex(scores)
         max_score = scores[max_index]
         scores[max_index] = float("-inf")
@@ -88,9 +89,7 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
             for _ in range(len(population))]
         if verbose:
             print "generation: %d" % (g,)
-            print "average score: %0.02f" % (list_util.Mean(scores),)
-            print "standard deviation: score: %0.02f" % (
-                list_util.StandardDeviation(scores),)
+            print "average score: %0.02f" % (average_score,)
             print "top performers: %0.02f, %0.02f" % (
                 max_score, second_max_score)
 
