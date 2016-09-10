@@ -1,4 +1,5 @@
 import default_agent_state
+import list_util
 import model
 import picking_cans_board
 import pickle
@@ -43,12 +44,12 @@ class QLearningModel(model.Model):
             # For exploration we pick a random action some of the time.
             best_actions = [a[0] for a in picking_cans_board.ACTIONS]
         else:
-            best_actions = MaxIndices(self._q_matrix[int(state)])
+            best_actions = list_util.MaxIndices(self._q_matrix[int(state)])
 
         return random.choice(best_actions)
 
     def Update(self, initial_state, action, final_state, reward):
-        best_action = MaxIndices(self._q_matrix[int(final_state)])[0]
+        best_action = list_util.MaxIndices(self._q_matrix[int(final_state)])[0]
         self._q_matrix[int(initial_state)][action] = (
             ((1.0 - self._learning_rate) *
              self._q_matrix[int(initial_state)][action]) +
@@ -74,22 +75,18 @@ def Train(rows=10, columns=10, random_wall=False, games=200,
         board.RandomizeCurrentPosition()
         score = board.PickCansWithModel(
             model, actions_per_game=actions_per_game)
-        latest_score[i % len(latest_score)] = score
+
+        if len(latest_score) < 1000:
+            latest_score.append(score)
+        else:
+            latest_score[i % len(latest_score)] = score
 
         if verbose:
-            print "game %7d: %3d %.2f" % (i, score, sum(latest_score) / float(len(latest_score)))
+            print "game %7d: %3d %.2f %.2f" % (
+                i, score, list_util.Mean(latest_score),
+                list_util.StandardDeviation(latest_score))
+
         if model_file_prefix and (i % model_save_frequency == 0):
             model.SaveToFile("%s-%d.txt" % (model_file_prefix, i))
 
     return model
-
-def MaxIndices(L):
-    max_indices = [0]
-    for i in range(1, len(L)):
-        if L[i] > L[max_indices[0]]:
-            max_indices = [i]
-        elif L[i] == L[max_indices[0]]:
-            # TODO(samt): Since we are comparing floating point numbers we
-            # might want a better comparison method.
-            max_indices.append(i)
-    return max_indices

@@ -1,4 +1,5 @@
 import default_agent_state
+import list_util
 import model
 import picking_cans_board
 import pickle
@@ -75,11 +76,10 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
                 scores[p] += score
             scores[p] /= games
 
-        average_score = sum(scores) / population_size
-        max_index = MaxIndex(scores)
+        max_index = list_util.MaxIndex(scores)
         max_score = scores[max_index]
         scores[max_index] = float("-inf")
-        second_max_index = MaxIndex(scores)
+        second_max_index = list_util.MaxIndex(scores)
         second_max_score = scores[second_max_index]
 
         fittest = (population[max_index], population[second_max_index])
@@ -88,17 +88,12 @@ def Train(rows=10, columns=10, generations=500, population_size=200, games=200,
             for _ in range(len(population))]
         if verbose:
             print "generation: %d" % (g,)
-            print "average score: %0.02f" % (average_score,)
+            print "average score: %0.02f" % (list_util.Mean(scores),)
+            print "standard deviation: score: %0.02f" % (
+                list_util.StandardDeviation(scores),)
             print "top performers: %0.02f, %0.02f" % (
                 max_score, second_max_score)
 
         fittest[0].SaveToFile("%s-%d-%d.txt" % (model_file_prefix, g, 0))
         fittest[1].SaveToFile("%s-%d-%d.txt" % (model_file_prefix, g, 1))
     return fittest
-
-def MaxIndex(L):
-    max_index = 0
-    for i in range(len(L)):
-        if L[i] > L[max_index]:
-            max_index = i
-    return max_index

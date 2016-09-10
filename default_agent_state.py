@@ -63,7 +63,7 @@ class DefaultAgentState():
 
     @staticmethod
     def NumberOfStates():
-        return len(picking_cans_board.CELLS)**NumberOfVisibleCells()
+        return len(picking_cans_board.CELLS)**DefaultAgentState.NumberOfVisibleCells()
 
     def __str__(self):
         output = []

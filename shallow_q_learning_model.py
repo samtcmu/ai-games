@@ -1,5 +1,6 @@
 import default_agent_state
 import linear_regression
+import list_util
 import model
 import picking_cans_board
 import pickle
@@ -84,14 +85,14 @@ class ShallowQLearningModel(model.Model):
             action_values = [
                 self._q_matrix_model.Infer(self._FeatureVector(state, a[0]))
                 for a in picking_cans_board.ACTIONS]
-            best_actions = MaxIndices(action_values)
+            best_actions = list_util.MaxIndices(action_values)
 
         return random.choice(best_actions)
 
     def Update(self, initial_state, action, final_state, reward):
         action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_state, a[0]))
                          for a in picking_cans_board.ACTIONS]
-        best_action = MaxIndices(action_values)[0]
+        best_action = list_util.MaxIndices(action_values)[0]
         updated_q_value = (
             ((1.0 - self._learning_rate) *
              self._q_matrix_model.Infer(self._FeatureVector(initial_state, action))) +
@@ -121,28 +122,23 @@ def Train(rows=10, columns=10, random_wall=False, games=200,
         agent_state_class=agent_state_class)
     board = picking_cans_board.Board(
         rows, columns, agent_state_class=agent_state_class)
-    latest_score = [0 for _ in range(1000)]
+    latest_score = []
     for i in range(1, games + 1):
         board.Randomize(random_wall=random_wall)
         board.RandomizeCurrentPosition()
         score = board.PickCansWithModel(
             model, actions_per_game=actions_per_game)
-        latest_score[i % len(latest_score)] = score
+
+        if len(latest_score) < 1000:
+            latest_score.append(score)
+        else:
+            latest_score[i % len(latest_score)] = score
 
         if verbose:
-            print "game %7d: %3d %.2f" % (i, score, sum(latest_score) / float(len(latest_score)))
+            print "game %7d: %3d %.2f %.2f" % (
+                i, score, list_util.Mean(latest_score),
+                list_util.StandardDeviation(latest_score))
         if model_file_prefix and (i % model_save_frequency == 0):
             model.SaveToFile("%s-%d.txt" % (model_file_prefix, i))
 
     return model
-
-def MaxIndices(L):
-    max_indices = [0]
-    for i in range(1, len(L)):
-        if L[i] > L[max_indices[0]]:
-            max_indices = [i]
-        elif L[i] == L[max_indices[0]]:
-            # TODO(samt): Since we are comparing floating point numbers we
-            # might want a better comparison method.
-            max_indices.append(i)
-    return max_indices
