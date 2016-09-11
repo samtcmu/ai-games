@@ -35,10 +35,7 @@ def GetModelClass(model_type):
             filename=f,
             agent_state_class=a)),
         "shallow-q-learning": (lambda f, a: shallow_q_learning_model.ShallowQLearningModel(
-            learning_rate=0.0,
-            discount_rate=0.0,
-            exploration_rate=0.0,
-            linear_regression_learning_rate=0.0,
+            disable_training=True,
             filename=f,
             agent_state_class=a)),
     }

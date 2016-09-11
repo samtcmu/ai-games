@@ -10,12 +10,13 @@ class ShallowQLearningModel(model.Model):
     def __init__(self, learning_rate=1.0, discount_rate=1.0,
                  exploration_rate=0.1, linear_regression_learning_rate=0.1,
                  agent_state_class=default_agent_state.DefaultAgentState,
-                 filename=None):
+                 filename=None, disable_training=False):
         self._learning_rate = learning_rate
         self._discount_rate = discount_rate
         self._exploration_rate = exploration_rate
         self._linear_regression_learning_rate = linear_regression_learning_rate
         self._agent_state_class = agent_state_class
+        self._disable_training = disable_training
         if filename:
             self.LoadFromFile(filename)
         else:
@@ -77,8 +78,11 @@ class ShallowQLearningModel(model.Model):
 
         return reduce(lambda x, y: x + y, feature_vector, [])
 
+    def SetDisableTraining(disable_training):
+        self._disable_training = disable_training
+
     def ActionForState(self, state):
-        if random.random() < self._exploration_rate:
+        if not self._disable_training and (random.random() < self._exploration_rate):
             # For exploration we pick a random action some of the time.
             best_actions = [a[0] for a in picking_cans_board.ACTIONS]
         else:
@@ -90,6 +94,9 @@ class ShallowQLearningModel(model.Model):
         return random.choice(best_actions)
 
     def Update(self, initial_state, action, final_state, reward):
+        if self._disable_training:
+            return
+
         action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_state, a[0]))
                          for a in picking_cans_board.ACTIONS]
         best_action = list_util.MaxIndices(action_values)[0]
