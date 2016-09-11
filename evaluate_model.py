@@ -102,6 +102,11 @@ def EvaluateModels(games=1000, board_size=(10, 10), model_dir=None,
         processes[-1].start()
 
     for _ in range(len(stats)):
-        print queue.get()
+        updated_stats = queue.get()
+        stats[updated_stats[0]] = updated_stats[1:]
     for p in processes:
         p.join()
+
+    # Sort models by average score.
+    for f in sorted(stats, key=(lambda s: stats[s][0])):
+        print "%s: mean: %4.2f, stdev: %4.2f" % (f, stats[f][0], stats[f][1])
