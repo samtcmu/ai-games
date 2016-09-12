@@ -10,6 +10,7 @@ import q_learning_model
 import shallow_q_learning_model
 
 import list_util
+import logging
 import multiprocessing
 import os
 
@@ -74,39 +75,40 @@ def EvaluateModel(games=1000, board_size=(10, 10), model_file=None,
 
     return [mean_score, stdev_score]
 
-def RunEvaluateModel(queue, **kwargs):
-    queue.put([kwargs["model_file"]] + EvaluateModel(**kwargs))
+def RunEvaluateModel(args):
+    try:
+        kwargs = {}
+        for key, value in args:
+            kwargs[key] = value
+        return [kwargs["model_file"]] + EvaluateModel(**kwargs)
+    except Exception:
+        logging.exception("RunEvaluateModel failed on args: %s", args)
 
 def EvaluateModels(games=1000, board_size=(10, 10), model_dir=None,
-                  model_type="manual", agent_state_type="default",
-                  random_wall=False, actions_per_game=200, verbose=False):
-    queue = multiprocessing.Queue()
-    processes = []
+                   model_type="manual", agent_state_type="default",
+                   random_wall=False, actions_per_game=200, verbose=False):
     stats = {}
-    for f in os.listdir(model_dir):
-        model_file = os.path.join(model_dir, f)
-        stats[model_file] = None
-        processes.append(multiprocessing.Process(
-            target=RunEvaluateModel,
-            args=(queue,),
-            kwargs={
-                "games": games,
-                "board_size": board_size,
-                "model_file": model_file,
-                "model_type": model_type,
-                "agent_state_type": agent_state_type,
-                "random_wall": random_wall,
-                "actions_per_game": actions_per_game,
-                "verbose": verbose,
-            }))
-        processes[-1].start()
+    kwargs = {
+        "games": games,
+        "board_size": board_size,
+        "model_type": model_type,
+        "agent_state_type": agent_state_type,
+        "random_wall": random_wall,
+        "actions_per_game": actions_per_game,
+        "verbose": verbose,
+    }
+    model_files = [os.path.join(model_dir, f) for f in os.listdir(model_dir)
+                                              if f.find(".stats") == -1]
+    process_pool = multiprocessing.Pool(processes=len(model_files))
+    evaluation_results = process_pool.map(
+        RunEvaluateModel,
+        [[("model_file", f)] + kwargs.items() for f in model_files])
 
-    for _ in range(len(stats)):
-        updated_stats = queue.get()
-        stats[updated_stats[0]] = updated_stats[1:]
-    for p in processes:
-        p.join()
+    process_pool.close()
+    process_pool.join()
 
     # Sort models by average score.
+    for evaluation_result in evaluation_results:
+        stats[evaluation_result[0]] = evaluation_result[1:]
     for f in sorted(stats, key=(lambda s: stats[s][0])):
         print "%s: mean: %4.2f, stdev: %4.2f" % (f, stats[f][0], stats[f][1])

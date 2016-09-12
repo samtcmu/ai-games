@@ -1,0 +1,26 @@
+time python -c "import evaluate_model; evaluate_model.EvaluateModels(mo
+del_type='shallow-q-learning', agent_state_type='radius-two', model_dir='output/sql-model-0.2-0.9-0.05-0.1-radius-two', random_wall=False, verbose=False, games=200)"
+
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-600.txt: mean: 0.05, stdev: 1.87
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1300.txt: mean: 13.00, stdev: 382.57
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-300.txt: mean: 31.85, stdev: 40.53
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-800.txt: mean: 33.15, stdev: 37.77
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-500.txt: mean: 50.85, stdev: 54.47
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1900.txt: mean: 52.70, stdev: 59.44
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1000.txt: mean: 60.80, stdev: 65.81
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1500.txt: mean: 84.55, stdev: 63.32
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1600.txt: mean: 116.81, stdev: 92.50
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-100.txt: mean: 117.85, stdev: 304.66
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-200.txt: mean: 143.20, stdev: 105.98
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1700.txt: mean: 149.62, stdev: 117.03
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1100.txt: mean: 161.71, stdev: 106.47
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1400.txt: mean: 168.15, stdev: 111.01
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-400.txt: mean: 169.30, stdev: 125.33
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-900.txt: mean: 178.80, stdev: 307.92
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1800.txt: mean: 203.43, stdev: 117.33
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-700.txt: mean: 240.09, stdev: 142.15
+output/sql-model-0.2-0.9-0.05-0.1-radius-two/sql-model-1200.txt: mean: 294.68, stdev: 212.22
+
+real    212m13.149s
+user    39m34.527s
+sys     0m7.960s
