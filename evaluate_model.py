@@ -100,7 +100,7 @@ def EvaluateModels(games=1000, board_size=(10, 10), model_dir=None,
     kwargs_items = kwargs.items()
     model_files = [os.path.join(model_dir, f) for f in os.listdir(model_dir)
                                               if f.find(".stats") == -1]
-    process_pool = multiprocessing.Pool(processes=len(model_files))
+    process_pool = multiprocessing.Pool(processes=min(500, len(model_files)))
     evaluation_results = process_pool.map(
         RunEvaluateModel,
         [[("model_file", f)] + kwargs_items for f in model_files])
