@@ -142,7 +142,7 @@ def q_learning(train_model=True, model_file=None, random_wall=False,
             model, actions_per_game=200, verbose=True),)
 
 def shallow_q_learning(train_model=True, model_file=None, random_wall=False,
-                       agent_state_type="default"):
+                       agent_state_type="default", games=100000):
     agent_state_class = GetAgentStateClass(agent_state_type)
 
     if train_model:
@@ -150,7 +150,7 @@ def shallow_q_learning(train_model=True, model_file=None, random_wall=False,
             rows=10,
             columns=10,
             random_wall=random_wall,
-            games=100000,
+            games=games,
             actions_per_game=200,
             learning_rate=0.2,
             discount_rate=0.99,

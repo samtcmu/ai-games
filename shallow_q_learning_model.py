@@ -55,30 +55,32 @@ class ShallowQLearningModel(model.Model):
         return output
 
     def _FeatureVector(self, state, action):
-        feature_vector = []
+        feature_vector = [0.0 for _ in range(self._feature_vector_size)]
         state_array = self._StateAsArray(state)
+        len_cells = len(picking_cans_board.CELLS)
+        len_actions = len(picking_cans_board.ACTIONS)
+        len_action_cell_pairs = len_cells * len_actions
+        i = 0
 
         # For each of the cells in the position add a categorical feature for
         # each of the possible contents of the cell.
         for c in state_array:
-            feature = [0.0 for _ in range(len(picking_cans_board.CELLS))]
-            feature[int(c)] = 1.0
-            feature_vector.append(feature)
+            feature_vector[i + int(c)] = 1.0
+            i += len_cells
 
         # Add a categorical feature for each of the possible actions.
-        feature = [0.0 for _ in range(len(picking_cans_board.ACTIONS))]
-        feature[int(action)] = 1.0
-        feature_vector.append(feature)
+        feature_vector[i + int(action)] = 1.0
+        i += len_actions
 
         # Add a categorical feature for each combination of position cell, its
         # contents, and action.
         for c in state_array:
-            feature = [0.0 for _ in range(len(picking_cans_board.ACTIONS) *
-                                          len(picking_cans_board.CELLS))]
-            feature[int(c) * action] = 1.0
-            feature_vector.append(feature)
+            feature_vector[i + (int(c) * action)] = 1.0
+            i += len_action_cell_pairs
 
-        return reduce(lambda x, y: x + y, feature_vector, [])
+        assert i == self._feature_vector_size
+
+        return feature_vector
 
     def SetDisableTraining(disable_training):
         self._disable_training = disable_training
