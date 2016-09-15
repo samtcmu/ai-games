@@ -104,16 +104,17 @@ class ShallowQLearningModel(model.Model):
         action_values = [self._q_matrix_model.Infer(self._FeatureVector(final_state, a[0]))
                          for a in picking_cans_board.ACTIONS]
         best_action = list_util.MaxIndices(action_values)[0]
+        initial_feature_vector = self._FeatureVector(initial_state, action)
         updated_q_value = (
             ((1.0 - self._learning_rate) *
-             self._q_matrix_model.Infer(self._FeatureVector(initial_state, action))) +
+             self._q_matrix_model.Infer(initial_feature_vector)) +
             (self._learning_rate *
              (reward + (self._discount_rate *
               self._q_matrix_model.Infer(self._FeatureVector(
                   final_state, best_action))))))
 
         self._q_matrix_model.Train([
-            [self._FeatureVector(initial_state, action), updated_q_value]],
+            [initial_feature_vector, updated_q_value]],
             learning_rate=self._linear_regression_learning_rate,
             learning_iterations=1,
             regularization_rate=0.0,

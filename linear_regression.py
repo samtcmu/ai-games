@@ -55,9 +55,9 @@ class LinearRegression:
         for k in range(learning_iterations):
             random.shuffle(training_data)
             current_classifications = [self._Infer(t[0]) for t in training_data]
-            current_fitness = self.Fitness(training_data,
-                                           current_classifications)
             if verbose:
+                current_fitness = self.Fitness(training_data,
+                                               current_classifications)
                 print "fitness(%4d): %0.3f" % (k, current_fitness)
                 print "model(%4d): %s" % (k, self)
 
@@ -70,7 +70,6 @@ class LinearRegression:
                 self._weights = VectorSum(
                     self._weights,
                     VectorScalarProduct(learning_rate, weights_gradient))
-
 
 def VectorDotProduct(A, B):
     assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
