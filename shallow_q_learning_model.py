@@ -54,7 +54,7 @@ class ShallowQLearningModel(model.Model):
                     output.append(cell_contents)
         return output
 
-    def _OldFeatureVector(self, state, action):
+    def _FeatureVector(self, state, action):
         feature_vector = []
         state_array = self._StateAsArray(state)
 
@@ -79,31 +79,6 @@ class ShallowQLearningModel(model.Model):
             feature_vector.append(feature)
 
         return reduce(lambda x, y: x + y, feature_vector, [])
-
-    def _NewFeatureVector(self, state, action):
-        feature_vector = [None for _ in range(self._feature_vector_size)]
-        state_array = self._StateAsArray(state)
-        i = 0;
-
-        for c in state_array:
-            for j in range(len(picking_cans_board.CELLS)):
-                feature_vector[i + j] = 1.0 if int(c) == j else 0.0
-            i += len(picking_cans_board.CELLS)
-
-        for j in range(len(picking_cans_board.ACTIONS)):
-            feature_vector[i + j] = 1.0 if int(action) == j else 0.0
-        i += len(picking_cans_board.ACTIONS)
-
-        for c in state_array:
-            for j in range(len(picking_cans_board.ACTIONS) *
-                           len(picking_cans_board.CELLS)):
-                feature_vector[i + j] = 1.0 if int(c) * int(action) == j else 0.0
-            i += len(picking_cans_board.ACTIONS) * len(picking_cans_board.CELLS)
-
-        return feature_vector
-
-    def _FeatureVector(self, state, action):
-        return self._OldFeatureVector(state, action)
 
     def SetDisableTraining(disable_training):
         self._disable_training = disable_training
