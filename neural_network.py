@@ -14,9 +14,9 @@ class NeuralNetwork:
     def __str__(self):
         output = ""
         for l in range(len(self._weights)):
-            output += "layer %d:\n" % (l,)
+            output += "layer %d:\n" % (l + 1,)
             for i in range(len(self._weights[l])):
-                output += "    "
+                output += "  neuron %d:" % (i + 1,)
                 for j in range(len(self._weights[l][i])):
                     # TODO(samt): Adjust the width based on the maximum weight.
                     output += "{0:7.2f}".format(self._weights[l][i][j],) + " "
