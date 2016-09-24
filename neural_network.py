@@ -35,3 +35,18 @@ class NeuralNetwork:
                 for j in range(len(self._weights[l][i])):
                     self._weights[l][i][j] = random.uniform(
                         random_range[0], random_range[1])
+
+    def Infer(self, inputs):
+        return self._Infer([-1.0] + inputs)
+
+    def _Infer(self, inputs):
+        pass
+
+    def Fitness(self, training_data, classifications):
+        pass
+
+    def Train(self):
+        pass
+
+    def _Train(self):
+        pass
