@@ -1,4 +1,4 @@
-import math
+import math_util
 import random
 
 class LinearRegression:
@@ -18,7 +18,7 @@ class LinearRegression:
         return self._Infer([-1.0] + inputs)
 
     def _Infer(self, inputs):
-        return VectorDotProduct(self._weights, inputs)
+        return math_util.VectorDotProduct(self._weights, inputs)
 
     def Fitness(self, training_data, classifications):
         output = 0.0
@@ -40,7 +40,8 @@ class LinearRegression:
         return weights_gradient
 
     def _RegularizationGradient(self, regularization_rate):
-        return VectorScalarProduct(2 * regularization_rate, self._weights)
+        return math_util.VectorScalarProduct(
+            2 * regularization_rate, self._weights)
 
     def Train(self, training_data, learning_rate=1.0, learning_iterations=1,
               regularization_rate=1.0, verbose=False):
@@ -64,26 +65,10 @@ class LinearRegression:
             for t, c in zip(training_data, current_classifications):
                 weights_gradient = self._WeightsGradient(
                     [t], [c], verbose=False)
-                weights_gradient = VectorDifference(
+                weights_gradient = math_util.VectorDifference(
                     weights_gradient,
                     self._RegularizationGradient(regularization_rate))
-                self._weights = VectorSum(
+                self._weights = math_util.VectorSum(
                     self._weights,
-                    VectorScalarProduct(learning_rate, weights_gradient))
-
-def VectorDotProduct(A, B):
-    assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
-    return sum(A[i] * B[i] for i in range(len(A)))
-
-def VectorScalarProduct(c, A):
-    return [c * A[i] for i in range(len(A))]
-
-def VectorDifference(A, B):
-    return VectorSum(A, VectorScalarProduct(-1.0, B))
-
-def VectorSum(A, B):
-    assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
-    return [A[i] + B[i] for i in range(len(A))]
-
-def VectorMagnitude(A):
-    return math.sqrt(sum(a**2 for a in A))
+                    math_util.VectorScalarProduct(
+                        learning_rate, weights_gradient))

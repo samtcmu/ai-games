@@ -1,4 +1,5 @@
 import linear_regression
+import math_util
 import random
 
 def LinearRegressionTest():
@@ -30,7 +31,7 @@ def CreateTrainingData(weights, num_training_examples, low, high,
     for i in range(num_training_examples):
         input_data = [-1.0] + RandomVector(len(weights) - 1, low, high)
         expected_output = (
-            linear_regression.VectorDotProduct(input_data, weights) + 
+            math_util.VectorDotProduct(input_data, weights) +
             random.gauss(0.0, noise_stdev))
         training_data.append([input_data[1:], expected_output])
     return training_data
