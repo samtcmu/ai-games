@@ -8,19 +8,19 @@ class NeuralNetwork:
         self._layer_widths = (
             [self._input_width] + hidden_layer_widths + [self._output_width])
 
-        self._weights = [[[0.0 for j in range(self._layer_widths[l - 1] + 1)]
-                               for i in range(self._layer_widths[l])]
+        self._weights = [[[0.0 for i in range(self._layer_widths[l])]
+                               for j in range(self._layer_widths[l - 1] + 1)]
                                for l in range(1, len(self._layer_widths))]
 
     def __str__(self):
         output = ""
         for l in range(len(self._weights)):
             output += "layer %d:\n" % (l + 1,)
-            for i in range(len(self._weights[l])):
+            for i in range(len(self._weights[l][0])):
                 output += "  neuron %d:" % (i + 1,)
-                for j in range(len(self._weights[l][i])):
+                for j in range(len(self._weights[l])):
                     # TODO(samt): Adjust the width based on the maximum weight.
-                    output += "{0:7.2f}".format(self._weights[l][i][j],) + " "
+                    output += "{0:7.2f}".format(self._weights[l][j][i],) + " "
                 output += "\n"
         return output
 
@@ -28,54 +28,47 @@ class NeuralNetwork:
         assert 1 <= l <= len(self._layer_widths)
         assert 1 <= i <= len(self._layer_widths[i])
         assert 0 <= j <= len(self._layer_widths[j])
-        return self._weights[l - 1][i - 1][j]
+        return self._weights[l - 1][j][i - 1]
 
     def RandomizeWeights(self, random_range=(-1.0, 1.0)):
         for l in range(len(self._weights)):
-            for i in range(len(self._weights[l])):
-                for j in range(len(self._weights[l][i])):
-                    self._weights[l][i][j] = random.uniform(
+            for j in range(len(self._weights[l])):
+                for i in range(len(self._weights[l][j])):
+                    self._weights[l][j][i] = random.uniform(
                         random_range[0], random_range[1])
 
     def Infer(self, inputs):
-        # TODO(samtet): Update the way we store the weights matrix so that no
-        # MatrixTranspose operations are required in Infer and _Infer.
-        # Right now we do:
-        #   W * transpose(input)
-        # Instead we want to do:
-        #   input * W'
-        # where W' = transpose(W) which will be the standard way we store the
-        # weights matrix.
-        return math_util.MatrixTranspose(self._Infer(inputs)[-1])[0]
+        return self._Infer(inputs)[-1]
 
     def _Infer(self, inputs):
         outputs = []
-        current_layer_inputs = math_util.MatrixTranspose([[-1.0] + inputs])
+        current_layer_inputs = [[-1.0] + inputs]
         for l in range(len(self._weights)):
             current_layer_ouputs = [
                 [math_util.Sigmoid(x) for x in row]
-                for row in math_util.MatrixMult(self._weights[l],
-                                                current_layer_inputs)]
-            outputs.append(current_layer_ouputs)
-            current_layer_inputs = [[-1.0]] + current_layer_ouputs
+                for row in math_util.MatrixMult(current_layer_inputs,
+                                                self._weights[l])]
+            outputs.append(current_layer_ouputs[0])
+            current_layer_inputs = [[-1.0] + current_layer_ouputs[0]]
+
         return outputs
 
     def Fitness(self, training_data, classifications):
         output = 0.0
         for t, c in zip(training_data, classifications):
             output += (-0.5 * math_util.VectorMagnitude(
-                       math_util.VectorDifference(t[1], c[-1][0]))**2)
+                       math_util.VectorDifference(t[1], c[-1]))**2)
         return output
 
     def _WeightsGradientForSingleTrainingExample(self, t, c, verbose=False):
-        weights_gradient = [[[0.0 for j in range(self._layer_widths[l - 1] + 1)]
-                                  for i in range(self._layer_widths[l])]
+        weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
+                                  for j in range(self._layer_widths[l - 1] + 1)]
                                   for l in range(1, len(self._layer_widths))]
         return weights_gradient
 
     def _WeightsGradient(self, training_data, classifications, verbose=False):
-        weights_gradient = [[[0.0 for j in range(self._layer_widths[l - 1] + 1)]
-                                  for i in range(self._layer_widths[l])]
+        weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
+                                  for j in range(self._layer_widths[l - 1] + 1)]
                                   for l in range(1, len(self._layer_widths))]
         return weights_gradient
 
