@@ -4,19 +4,19 @@ import neural_network
 import random
 
 def NeuralNetworkTest():
-    expected_weights = [200.0, 10.0, 200.0]
     noise_stdev = 0.01
+    inputs = 2
     training_data = CreateTrainingData(
-        expected_weights, 1000, -20.0, 40.0, noise_stdev=noise_stdev)
+        inputs, 1000, -20.0, 40.0, noise_stdev=noise_stdev)
     test_data = CreateTrainingData(
-        expected_weights, 500, -20.0, 40.0, noise_stdev=noise_stdev)
+        inputs, 500, -20.0, 40.0, noise_stdev=noise_stdev)
 
-    model = neural_network.NeuralNetwork(input_width=len(expected_weights) - 1,
+    model = neural_network.NeuralNetwork(input_width=inputs,
                                          output_width=1,
-                                         hidden_layer_widths=[4, 8, 4, 2])
+                                         hidden_layer_widths=[4, 2])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(training_data,
-                learning_rate=0.005,
+                learning_rate=0.01,
                 learning_iterations=1000,
                 regularization_rate=0.0,
                 verbose=True)
@@ -28,15 +28,15 @@ def NeuralNetworkTest():
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)
 
-def CreateTrainingData(weights, num_training_examples, low, high,
+def CreateTrainingData(inputs, num_training_examples, low, high,
                        noise_stdev=5.0):
     training_data = []
     for i in range(num_training_examples):
-        input_data = [-1.0] + RandomVector(len(weights) - 1, low, high)
+        input_data = RandomVector(inputs, low, high)
         expected_output = (
-            math_util.Sigmoid(math_util.VectorDotProduct(input_data, weights)) +
+            math_util.Sigmoid(math_util.VectorDotProduct(input_data, input_data)) +
             random.gauss(0.0, noise_stdev))
-        training_data.append([input_data[1:], [expected_output]])
+        training_data.append([input_data, [expected_output]])
     return training_data
 
 def RandomVector(size, low, high):

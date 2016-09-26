@@ -27,7 +27,7 @@ class NeuralNetwork:
         for l in range(len(self._weights)):
             output += "layer %d:\n" % (l + 1,)
             for i in range(len(self._weights[l][0])):
-                output += "  neuron %d:" % (i + 1,)
+                output += "  neuron %d: " % (i + 1,)
                 for j in range(len(self._weights[l])):
                     # TODO(samt): Adjust the width based on the maximum weight.
                     output += "{0:8.5f}".format(self._weights[l][j][i],) + " "
