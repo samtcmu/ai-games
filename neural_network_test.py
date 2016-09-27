@@ -18,7 +18,7 @@ def NeuralNetworkTest():
     model.Train(training_data,
                 learning_rate=0.01,
                 learning_iterations=1000,
-                regularization_rate=0.00000001,
+                regularization_rate=0.00001,
                 verbose=True)
 
     total_difference = 0

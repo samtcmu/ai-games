@@ -133,15 +133,14 @@ class NeuralNetwork:
                     [t], [c], verbose=False)
 
                 for l in range(len(self._weights)):
-                    weights_gradient[l] = math_util.MatrixScalarProduct(
-                        learning_rate, weights_gradient[l])
-
-                    # TODO(samt): Should regularization be applied once per
-                    # training example or only once per learning iteration?
-                    regularization_gradient = self._RegularizationGradient(
-                        l, regularization_rate)
-                    weights_gradient[l] = math_util.MatrixDifference(
-                        weights_gradient[l], regularization_gradient)
-
                     self._weights[l] = math_util.MatrixSum(
-                        self._weights[l], weights_gradient[l])
+                        self._weights[l],
+                        math_util.MatrixScalarProduct(
+                            learning_rate, weights_gradient[l]))
+
+            # Apply L2 Regularization to self._weights.
+            for l in range(len(self._weights)):
+                regularization_gradient = self._RegularizationGradient(
+                    l, regularization_rate)
+                self._weights[l] = math_util.MatrixDifference(
+                    self._weights[l], regularization_gradient)
