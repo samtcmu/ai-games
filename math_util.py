@@ -37,6 +37,9 @@ def MatrixSum(A, B):
     return [[A[i][j] + B[i][j] for j in range(len(A[0]))]
                                for i in range(len(A))]
 
+def MatrixDifference(A, B):
+    return MatrixSum(A, MatrixScalarProduct(-1.0, B))
+
 def MatrixScalarProduct(c, A):
     return [[c * A[i][j] for j in range(len(A[0]))]
                          for i in range(len(A))]

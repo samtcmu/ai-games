@@ -1,16 +1,6 @@
 import math_util
 import random
 
-def PrintMatrix(M):
-    output = ""
-    for i in range(len(M[0])):
-        output += "  row %d:" % (i + 1,)
-        for j in range(len(M)):
-            # TODO(samt): Adjust the width based on the maximum weight.
-            output += "{0:12.8f}".format(M[j][i],) + " "
-        output += "\n"
-    return output
-
 class NeuralNetwork:
     def __init__(self, input_width, output_width, hidden_layer_widths=[]):
         self._input_width = input_width
@@ -119,6 +109,10 @@ class NeuralNetwork:
 
         return weights_gradient
 
+    def _RegularizationGradient(self, l, regularization_rate):
+        return math_util.MatrixScalarProduct(
+            2 * regularization_rate, self._weights[l])
+
     def Train(self, training_data, learning_rate=1.0, learning_iterations=10,
               regularization_rate=0.0, verbose=False):
         for k in range(learning_iterations):
@@ -139,7 +133,14 @@ class NeuralNetwork:
                     [t], [c], verbose=False)
 
                 for l in range(len(self._weights)):
+                    regularization_gradient = self._RegularizationGradient(
+                        l, regularization_rate)
+
+                    weights_gradient[l] = math_util.MatrixScalarProduct(
+                        learning_rate, weights_gradient[l])
+
+                    weights_gradient[l] = math_util.MatrixDifference(
+                        weights_gradient[l], regularization_gradient)
+
                     self._weights[l] = math_util.MatrixSum(
-                        self._weights[l],
-                        math_util.MatrixScalarProduct(
-                            learning_rate, weights_gradient[l]))
+                        self._weights[l], weights_gradient[l])
