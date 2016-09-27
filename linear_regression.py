@@ -65,10 +65,11 @@ class LinearRegression:
             for t, c in zip(training_data, current_classifications):
                 weights_gradient = self._WeightsGradient(
                     [t], [c], verbose=False)
-                weights_gradient = math_util.VectorDifference(
-                    weights_gradient,
-                    self._RegularizationGradient(regularization_rate))
                 self._weights = math_util.VectorSum(
                     self._weights,
                     math_util.VectorScalarProduct(
                         learning_rate, weights_gradient))
+
+            self._weights = math_util.VectorDifference(
+                self._weights,
+                self._RegularizationGradient(regularization_rate))
