@@ -123,7 +123,7 @@ class NeuralNetwork:
             if verbose:
                 current_fitness = self.Fitness(training_data,
                                                current_classifications)
-                print "fitness(%4d): %s" % (k, "{:,.4f}".format(current_fitness))
+                print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
                 print "model(%4d): \n%s" % (k, self)
 
             for t, c in zip(training_data, current_classifications):
