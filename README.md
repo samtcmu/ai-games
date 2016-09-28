@@ -3,6 +3,14 @@
 The goal of this project is to collect various AIs that can learn to play simple
 games.
 
+# Setup
+
+Download termcolor 1.1.0 from https://pypi.python.org/pypi/termcolor and install by running:
+
+```
+sudo python setup.py install
+```
+
 # Shallow Q-Learning
 
 To train a model run the following:
