@@ -71,11 +71,10 @@ class ShallowQLearningModel(model.Model):
         # Add a categorical feature for each of the possible actions.
         feature_vector[i + int(action)] = 1.0
         i += len_actions
-
         # Add a categorical feature for each combination of position cell, its
         # contents, and action.
         for c in state_array:
-            feature_vector[i + (int(c) * action)] = 1.0
+            feature_vector[i + ((action * len_cells) + int(c))] = 1.0
             i += len_action_cell_pairs
 
         assert i == self._feature_vector_size
