@@ -1,10 +1,13 @@
 import linear_regression
 import math
 import math_util
+import mnist_data_loader
 import neural_network
 import random
+import sys
+import termcolor
 
-def f(x):
+def InverseSigmoid(x):
     try:
         return -1.0 * (2000.0) * math.log((1.0 / x) - 1.0)
     except ZeroDivisionError:
@@ -35,8 +38,8 @@ def NeuralNetworkTest():
 
     total_difference = 0
     for t in test_data:
-        actual = f(model.Infer(t[0])[0])
-        expected = f(t[1][0])
+        actual = InverseSigmoid(model.Infer(t[0])[0])
+        expected = InverseSigmoid(t[1][0])
         difference = abs(actual - expected)
         print "%s %s %s" % ("{0:9,.4f}".format(actual),
                             "{0:9,.4f}".format(expected),
@@ -45,6 +48,44 @@ def NeuralNetworkTest():
     print "average absolute difference on test data: %.3f" % (
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)
+
+def MnistTest(verbose=False):
+    training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
+
+    validation_data = training_data[-len(training_data) / 6:]
+    training_data = training_data[:-len(training_data) / 6]
+
+    transformed_training_data = TransformMnistData(
+        training_data, description="training-data", verbose=verbose)
+    transformed_validation_data = TransformMnistData(
+        validation_data, description="validation-data", verbose=verbose)
+    transformed_test_data = TransformMnistData(
+        test_data, description="test-data", verbose=verbose)
+
+def TransformMnistData(mnist_data, description="mnist-data", verbose=False):
+
+    if verbose:
+        print "transforming: %s" % (description,)
+        print "progress: start" + (" " * 50) + "end"
+        print "              [",
+
+    transformed_mnist_data = []
+    for i in range(len(mnist_data)):
+        image, label = mnist_data[i]
+
+        transformed_label = [0.0 for _ in range(10)]
+        transformed_label[label] = 1.0
+
+        transformed_image = [x / 255.0 for x in image]
+
+        if verbose and (i % (len(mnist_data)/ 50) == 0):
+            sys.stdout.write(termcolor.colored("=", color="yellow"))
+            sys.stdout.flush()
+
+    if verbose:
+        print "]\n"
+
+    return transformed_mnist_data
 
 def CreateTrainingData(inputs, num_training_examples, low, high,
                        noise_stdev=5.0):

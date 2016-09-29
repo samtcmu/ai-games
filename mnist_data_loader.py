@@ -1,4 +1,5 @@
 import gzip
+import math
 import struct
 import sys
 import termcolor
@@ -39,13 +40,11 @@ def ReadMnistData(image_file_path, label_file_path, verbose=False):
         rows = struct.unpack(">I", image_file.read(4))[0]
         columns = struct.unpack(">I", image_file.read(4))[0]
 
-        fmt = "B" * (rows * columns)
+        cells_per_image = rows * columns
+        fmt = "B" * (cells_per_image)
         for i in range(number_of_examples):
-            current_image = []
-            flattened_image = struct.unpack(fmt, image_file.read(rows * columns))
-            for r in range(rows):
-                current_image.append(
-                    flattened_image[r * columns: (r + 1) * columns])
+            current_image = list(
+                struct.unpack(fmt, image_file.read(cells_per_image)))
             data.append([current_image])
 
             if verbose and (i % (number_of_examples / 50) == 0):
@@ -86,13 +85,16 @@ def PrintTrainingData(indices, verbose=False):
         print "excpeted label: %d" % (training_data[i][1],)
 
 def MnistImageAsString(image):
+    # The input image is a single dimensional array with the cells of row 1,
+    # then the cells of row 2, etc.
     output = ""
-    for r in range(len(image)):
-        for c in range(len(image[r])):
+    side_length = int(math.sqrt(len(image)))
+    for r in range(side_length):
+        for c in range(side_length):
             color = None
-            if 0 <= image[r][c] < 64:
+            if 0 <= image[(r * side_length) + c] < 64:
                 color = "on_white"
-            elif 64 <= image[r][c] < 192:
+            elif 64 <= image[(r * side_length) + c] < 192:
                 color = "on_yellow"
             else:
                 color = "on_red"
