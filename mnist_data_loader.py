@@ -1,5 +1,4 @@
 import gzip
-import pickle
 import struct
 import sys
 import termcolor
@@ -40,13 +39,13 @@ def ReadMnistData(image_file_path, label_file_path, verbose=False):
         rows = struct.unpack(">I", image_file.read(4))[0]
         columns = struct.unpack(">I", image_file.read(4))[0]
 
+        fmt = "B" * (rows * columns)
         for i in range(number_of_examples):
             current_image = []
+            flattened_image = struct.unpack(fmt, image_file.read(rows * columns))
             for r in range(rows):
-                current_image.append([])
-                for c in range(columns):
-                    current_image[-1].append(
-                        struct.unpack("B", image_file.read(1))[0])
+                current_image.append(
+                    flattened_image[r * columns: (r + 1) * columns])
             data.append([current_image])
 
             if verbose and (i % (number_of_examples / 50) == 0):
