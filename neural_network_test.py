@@ -1,8 +1,10 @@
 import linear_regression
+import list_util
 import math
 import math_util
 import mnist_data_loader
 import neural_network
+import pickle
 import random
 import sys
 import termcolor
@@ -62,8 +64,60 @@ def MnistTest(verbose=False):
     transformed_test_data = TransformMnistData(
         test_data, description="test-data", verbose=verbose)
 
-def TransformMnistData(mnist_data, description="mnist-data", verbose=False):
+    model = neural_network.NeuralNetwork(
+        input_width=len(transformed_training_data[0][0]),
+        output_width=len(transformed_training_data[0][1]),
+        hidden_layer_widths=[15])
+    model.RandomizeWeights(random_range=(-1.0, 1.0))
+    model.Train(transformed_training_data,
+                learning_rate=0.00001,
+                learning_iterations=100,
+                regularization_rate=0.001,
+                verbose=True)
 
+def EvaluateNeuralNetowrk(model_file_path, verbose=False):
+    training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
+
+    validation_data = training_data[-len(training_data) / 6:]
+    training_data = training_data[:-len(training_data) / 6]
+
+    transformed_training_data = TransformMnistData(
+        training_data, description="training-data", verbose=verbose)
+    transformed_validation_data = TransformMnistData(
+        validation_data, description="validation-data", verbose=verbose)
+    transformed_test_data = TransformMnistData(
+        test_data, description="test-data", verbose=verbose)
+
+    model = None
+    with open(model_file_path, "r") as model_file:
+        model = pickle.load(model_file)
+
+    if verbose:
+        print "evaluating model: %s" % (model_file_path,)
+        print "progress: start" + (" " * 50) + "end"
+        print "              [",
+
+    correct_classifications = 0
+    for i in range(len(transformed_validation_data)):
+        [t, c] = transformed_validation_data[i]
+
+        classification = model.Infer(t)
+        label = list_util.MaxIndex(classification)
+        if label == list_util.MaxIndex(c):
+            correct_classifications += 1
+
+        if verbose and (i % (len(transformed_validation_data)/ 50) == 0):
+            sys.stdout.write(termcolor.colored("=", color="yellow"))
+            sys.stdout.flush()
+
+    if verbose:
+        print "]\n"
+
+    print "performance on training data: %d / %d (%3.2f %%)" % (
+        correct_classifications, len(transformed_validation_data),
+        100.0 * (float(correct_classifications) / len(transformed_validation_data)))
+
+def TransformMnistData(mnist_data, description="mnist-data", verbose=False):
     if verbose:
         print "transforming: %s" % (description,)
         print "progress: start" + (" " * 50) + "end"
@@ -77,6 +131,8 @@ def TransformMnistData(mnist_data, description="mnist-data", verbose=False):
         transformed_label[label] = 1.0
 
         transformed_image = [x / 255.0 for x in image]
+
+        transformed_mnist_data.append([transformed_image, transformed_label])
 
         if verbose and (i % (len(mnist_data)/ 50) == 0):
             sys.stdout.write(termcolor.colored("=", color="yellow"))

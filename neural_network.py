@@ -1,4 +1,5 @@
 import math_util
+import pickle
 import random
 
 class NeuralNetwork:
@@ -124,7 +125,9 @@ class NeuralNetwork:
                 current_fitness = self.Fitness(training_data,
                                                current_classifications)
                 print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
-                print "model(%4d): \n%s" % (k, self)
+                with open("output/mnist/nn-model-%d.txt" % (k), "w") as model_file:
+                    pickle.dump(self, model_file)
+                # print "model(%4d): \n%s" % (k, self)
 
             for t, c in zip(training_data, current_classifications):
                 # TODO(samt): Since we are running stochastic gradient descent
