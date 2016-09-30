@@ -63,6 +63,10 @@ class LinearRegression:
                 print "model(%4d): %s" % (k, self)
 
             for t, c in zip(training_data, current_classifications):
+                # TODO(samt): Current classification must be recomputed
+                # here since in previous iterations of this loop the
+                # weights have been changed.
+
                 weights_gradient = self._WeightsGradient(
                     [t], [c], verbose=False)
                 self._weights = math_util.VectorSum(

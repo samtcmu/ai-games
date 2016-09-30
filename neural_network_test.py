@@ -76,7 +76,7 @@ def MnistTest(verbose=False):
                 regularization_rate=0.001,
                 verbose=True)
 
-def EvaluateNeuralNetwork(model_file_path, verbose=False):
+def EvaluateNeuralNetworkOnMnist(model_file_path, verbose=False):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
 
     validation_data = training_data[-len(training_data) / 6:]
