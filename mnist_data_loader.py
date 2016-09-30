@@ -1,5 +1,6 @@
 import gzip
 import math
+import progress_bar
 import struct
 import sys
 import termcolor
@@ -25,11 +26,7 @@ def MnistData(verbose=False):
 def ReadMnistData(image_file_path, label_file_path, verbose=False):
     data = []
 
-    if verbose:
-        print "loading: %s" % (image_file_path,)
-        print "progress: start" + (" " * 50) + "end"
-        print "              [",
-
+    message = "loading: %s" % (image_file_path,)
     with gzip.open(image_file_path, "rb") as image_file:
         # MNIST image files should have a magic number equal to 2051 in Big
         # Endian notation in the first 4 bytes of the file.
@@ -40,24 +37,18 @@ def ReadMnistData(image_file_path, label_file_path, verbose=False):
         rows = struct.unpack(">I", image_file.read(4))[0]
         columns = struct.unpack(">I", image_file.read(4))[0]
 
-        cells_per_image = rows * columns
-        fmt = "B" * (cells_per_image)
-        for i in range(number_of_examples):
-            current_image = list(
-                struct.unpack(fmt, image_file.read(cells_per_image)))
-            data.append([current_image])
+        with progress_bar.ProgressBar(
+            number_of_examples, start_message=message, bar_color="red",
+            verbose=verbose) as bar:
+            cells_per_image = rows * columns
+            fmt = "B" * (cells_per_image)
+            for i in range(number_of_examples):
+                current_image = list(
+                    struct.unpack(fmt, image_file.read(cells_per_image)))
+                data.append([current_image])
+                bar.Increment()
 
-            if verbose and (i % (number_of_examples / 50) == 0):
-                sys.stdout.write(termcolor.colored("=", color="yellow"))
-                sys.stdout.flush()
-    if verbose:
-        print "]\n"
-            
-    if verbose:
-        print "loading: %s" % (label_file_path,)
-        print "progress: start" + (" " * 50) + "end"
-        print "              [",
-
+    message = "loading: %s" % (label_file_path,)
     with gzip.open(label_file_path, "rb") as label_file:
         # MNIST label files should have a magic number equal to 2049 in Big
         # Endian notation in the first 4 bytes of the file.
@@ -65,15 +56,13 @@ def ReadMnistData(image_file_path, label_file_path, verbose=False):
         assert magic_number == 2049
 
         number_of_examples = struct.unpack(">I", label_file.read(4))[0]
-        for i in range(number_of_examples):
-            data[i].append(struct.unpack("B", label_file.read(1))[0])
 
-            if verbose and (i % (number_of_examples / 50) == 0):
-                sys.stdout.write(termcolor.colored("=", color="yellow"))
-                sys.stdout.flush()
-
-    if verbose:
-        print "]\n"
+        with progress_bar.ProgressBar(
+            number_of_examples, start_message=message, bar_color="red",
+            verbose=verbose) as bar:
+            for i in range(number_of_examples):
+                data[i].append(struct.unpack("B", label_file.read(1))[0])
+                bar.Increment()
 
     return data
 
