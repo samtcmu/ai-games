@@ -1,5 +1,6 @@
 *.pyc
 *.pyc
+output/mnist/
 output/ga-model/
 output/ql-model/
 output/rl-model/
