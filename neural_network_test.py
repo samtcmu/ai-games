@@ -5,6 +5,7 @@ import math_util
 import mnist_data_loader
 import neural_network
 import pickle
+import progress_bar
 import random
 import sys
 import termcolor
@@ -30,12 +31,12 @@ def NeuralNetworkTest():
 
     model = neural_network.NeuralNetwork(input_width=len(weights) - 1,
                                          output_width=1,
-                                         hidden_layer_widths=[])
+                                         hidden_layer_widths=[4])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(training_data,
-                learning_rate=0.000001,
-                learning_iterations=3000,
-                regularization_rate=0.001,
+                learning_rate=0.001,
+                learning_iterations=4000,
+                regularization_rate=0.0001,
                 verbose=True)
 
     total_difference = 0
@@ -70,12 +71,12 @@ def MnistTest(verbose=False):
         hidden_layer_widths=[15])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(transformed_training_data,
-                learning_rate=0.00001,
+                learning_rate=0.001,
                 learning_iterations=100,
                 regularization_rate=0.001,
                 verbose=True)
 
-def EvaluateNeuralNetowrk(model_file_path, verbose=False):
+def EvaluateNeuralNetwork(model_file_path, verbose=False):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
 
     validation_data = training_data[-len(training_data) / 6:]
@@ -92,56 +93,58 @@ def EvaluateNeuralNetowrk(model_file_path, verbose=False):
     with open(model_file_path, "r") as model_file:
         model = pickle.load(model_file)
 
-    if verbose:
-        print "evaluating model: %s" % (model_file_path,)
-        print "progress: start" + (" " * 50) + "end"
-        print "              [",
+    EvaluateMnistDataWithModel(transformed_validation_data,
+                               model,
+                               data_name="validation data",
+                               model_name=model_file_path,
+                               verbose=verbose)
+    EvaluateMnistDataWithModel(transformed_training_data,
+                               model,
+                               data_name="training data",
+                               model_name=model_file_path,
+                               verbose=verbose)
 
-    correct_classifications = 0
-    for i in range(len(transformed_validation_data)):
-        [t, c] = transformed_validation_data[i]
+def EvaluateMnistDataWithModel(mnist_data, model, data_name="mnist-data",
+                               model_name="model", verbose=False):
+    with progress_bar.ProgressBar(
+        len(mnist_data),
+        start_message="evaluating %s with model: %s" % (
+            data_name, model_name),
+        bar_color="cyan", verbose=verbose) as bar:
+        correct_classifications = 0
+        for i in range(len(mnist_data)):
+            [t, c] = mnist_data[i]
 
-        classification = model.Infer(t)
-        label = list_util.MaxIndex(classification)
-        if label == list_util.MaxIndex(c):
-            correct_classifications += 1
+            classification = model.Infer(t)
+            label = list_util.MaxIndex(classification)
+            if label == list_util.MaxIndex(c):
+                correct_classifications += 1
 
-        if verbose and (i % (len(transformed_validation_data)/ 50) == 0):
-            sys.stdout.write(termcolor.colored("=", color="yellow"))
-            sys.stdout.flush()
+            bar.Increment()
 
-    if verbose:
-        print "]\n"
-
-    print "performance on training data: %d / %d (%3.2f %%)" % (
-        correct_classifications, len(transformed_validation_data),
-        100.0 * (float(correct_classifications) / len(transformed_validation_data)))
+    print "performance on %s: %d / %d (%3.2f %%)\n" % (
+        data_name, correct_classifications, len(mnist_data),
+        100.0 * (float(correct_classifications) / len(mnist_data)))
 
 def TransformMnistData(mnist_data, description="mnist-data", verbose=False):
-    if verbose:
-        print "transforming: %s" % (description,)
-        print "progress: start" + (" " * 50) + "end"
-        print "              [",
+    with progress_bar.ProgressBar(
+        len(mnist_data),
+        start_message="transforming: %s" % (description,),
+        bar_color="green", verbose=verbose) as bar:
+        transformed_mnist_data = []
+        for i in range(len(mnist_data)):
+            image, label = mnist_data[i]
 
-    transformed_mnist_data = []
-    for i in range(len(mnist_data)):
-        image, label = mnist_data[i]
+            transformed_label = [0.0 for _ in range(10)]
+            transformed_label[label] = 1.0
 
-        transformed_label = [0.0 for _ in range(10)]
-        transformed_label[label] = 1.0
+            transformed_image = [x / 255.0 for x in image]
 
-        transformed_image = [x / 255.0 for x in image]
+            transformed_mnist_data.append([transformed_image, transformed_label])
 
-        transformed_mnist_data.append([transformed_image, transformed_label])
+            bar.Increment()
 
-        if verbose and (i % (len(mnist_data)/ 50) == 0):
-            sys.stdout.write(termcolor.colored("=", color="yellow"))
-            sys.stdout.flush()
-
-    if verbose:
-        print "]\n"
-
-    return transformed_mnist_data
+        return transformed_mnist_data
 
 def CreateTrainingData(inputs, num_training_examples, low, high,
                        noise_stdev=5.0):
