@@ -24,7 +24,7 @@ class ProgressBar:
         self._start_time = time.clock()
         self._completed_tasks = 0
 
-        if self._verbose and False:
+        if self._verbose:
             print self._start_message
             print "[" + ("{:^%d}" % (self._quantas,)).format("progress") + "]\n",
             print "[",
@@ -33,12 +33,12 @@ class ProgressBar:
 
     def __exit__(self, type, value, traceback):
         self._end_time = time.clock()
-        if self._verbose and False:
+        if self._verbose:
             print "]"
             print "elapsed time: %.3f s\n" % (self._end_time - self._start_time)
 
     def Increment(self):
         self._completed_tasks += 1
-        if self._verbose and False and ((self._completed_tasks % self._quanta_size) == 0):
+        if self._verbose and ((self._completed_tasks % self._quanta_size) == 0):
             sys.stdout.write(termcolor.colored("=", color=self._bar_color))
             sys.stdout.flush()
