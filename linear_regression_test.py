@@ -13,7 +13,7 @@ def LinearRegressionTest():
     model = linear_regression.LinearRegression(len(expected_weights) - 1)
     model.RandomizeWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
-                learning_rate=0.0000005,
+                learning_rate=0.000001,
                 learning_iterations=10000,
                 regularization_rate=0.0,
                 verbose=True)

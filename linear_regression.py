@@ -55,20 +55,16 @@ class LinearRegression:
                regularization_rate=0.0, verbose=False):
         for k in range(learning_iterations):
             random.shuffle(training_data)
-            current_classifications = [self._Infer(t[0]) for t in training_data]
             if verbose:
+                current_classifications = [self._Infer(t[0]) for t in training_data]
                 current_fitness = self.Fitness(training_data,
                                                current_classifications)
-                print "fitness(%4d): %0.3f" % (k, current_fitness)
+                print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
                 print "model(%4d): %s" % (k, self)
 
-            for t, c in zip(training_data, current_classifications):
-                # TODO(samt): Current classification must be recomputed
-                # here since in previous iterations of this loop the
-                # weights have been changed.
-
+            for t in training_data:
                 weights_gradient = self._WeightsGradient(
-                    [t], [c], verbose=False)
+                    [t], [self._Infer(t[0])], verbose=False)
                 self._weights = math_util.VectorSum(
                     self._weights,
                     math_util.VectorScalarProduct(
