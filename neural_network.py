@@ -1,5 +1,6 @@
 import math_util
 import pickle
+import progress_bar
 import random
 
 class NeuralNetwork:
@@ -62,12 +63,17 @@ class NeuralNetwork:
             current_layer_inputs = [[-1.0] + current_layer_ouputs[0]]
         return outputs
 
-    def Fitness(self, training_data, classifications):
-        output = 0.0
-        for t, c in zip(training_data, classifications):
-            output += (-0.5 * math_util.VectorMagnitude(
-                       math_util.VectorDifference(t[1], c[-1][1:]))**2)
-        return output
+    def Fitness(self, training_data, classifications, k, verbose=False):
+        with progress_bar.ProgressBar(
+            len(training_data),
+            start_message="learnnig iteration %d: comptuting model fitness" % (k,),
+            bar_color="green", verbose=verbose) as bar:
+            output = 0.0
+            for t, c in zip(training_data, classifications):
+                output += (-0.5 * math_util.VectorMagnitude(
+                           math_util.VectorDifference(t[1], c[-1][1:]))**2)
+                bar.Increment()
+            return output
 
     def _WeightsGradientForSingleTrainingExample(self, t, c, verbose=False):
         weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
@@ -118,28 +124,40 @@ class NeuralNetwork:
               regularization_rate=0.0, verbose=False):
         for k in range(learning_iterations):
             random.shuffle(training_data)
-            current_classifications = [self._Infer(t[0]) for t in training_data]
-            current_fitness = self.Fitness(training_data,
-                                           current_classifications)
+
             if verbose:
+                current_classifications = []
+                with progress_bar.ProgressBar(
+                    len(training_data),
+                    start_message="training iteratoin %d: running inference" % (k,),
+                    bar_color="yellow", verbose=verbose) as bar:
+                    current_classifications = [
+                        [self._Infer(t[0]), bar.Increment()][0] for t in training_data]
                 current_fitness = self.Fitness(training_data,
-                                               current_classifications)
+                                               current_classifications,
+                                               k, verbose=verbose)
                 print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
-                with open("output/mnist/nn-model-%d.txt" % (k), "w") as model_file:
-                    pickle.dump(self, model_file)
-                # print "model(%4d): \n%s" % (k, self)
+                # with open("output/mnist/nn-model-%d.txt" % (k), "w") as model_file:
+                #     pickle.dump(self, model_file)
+                print "model(%4d): \n%s" % (k, self)
 
-            for t, c in zip(training_data, current_classifications):
-                # TODO(samt): Since we are running stochastic gradient descent
-                # here we should call _WeightsGradientForSingleTrainingExample.
-                weights_gradient = self._WeightsGradient(
-                    [t], [c], verbose=False)
+            with progress_bar.ProgressBar(
+                len(training_data),
+                start_message="training iteration %d: running gradient descent" % (k,),
+                bar_color="cyan", verbose=verbose) as bar:
+                for t in training_data:
+                    # TODO(samt): Since we are running stochastic gradient descent
+                    # here we should call _WeightsGradientForSingleTrainingExample.
+                    weights_gradient = self._WeightsGradient(
+                        [t], [self._Infer(t[0])], verbose=False)
 
-                for l in range(len(self._weights)):
-                    self._weights[l] = math_util.MatrixSum(
-                        self._weights[l],
-                        math_util.MatrixScalarProduct(
-                            learning_rate, weights_gradient[l]))
+                    for l in range(len(self._weights)):
+                        self._weights[l] = math_util.MatrixSum(
+                            self._weights[l],
+                            math_util.MatrixScalarProduct(
+                                learning_rate, weights_gradient[l]))
+
+                    bar.Increment()
 
             # Apply L2 Regularization to self._weights.
             for l in range(len(self._weights)):

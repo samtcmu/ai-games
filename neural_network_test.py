@@ -1,4 +1,3 @@
-import linear_regression
 import list_util
 import math
 import math_util
@@ -7,8 +6,6 @@ import neural_network
 import pickle
 import progress_bar
 import random
-import sys
-import termcolor
 
 def InverseSigmoid(x):
     try:
