@@ -13,6 +13,7 @@ import list_util
 import logging
 import multiprocessing
 import os
+import progress_bar
 
 def GetAgentStateClass(agent_state_type):
     agent_state_classes = {
@@ -80,7 +81,10 @@ def RunEvaluateModel(args):
         kwargs = {}
         for key, value in args:
             kwargs[key] = value
-        return [kwargs["model_file"]] + EvaluateModel(**kwargs)
+        bar = kwargs.pop("bar", None)
+        output = [kwargs["model_file"]] + EvaluateModel(**kwargs)
+        bar.Increment()
+        return output
     except Exception:
         logging.exception("RunEvaluateModel failed on args: %s", args)
 
@@ -101,12 +105,18 @@ def EvaluateModels(games=1000, board_size=(10, 10), model_dir=None,
     model_files = [os.path.join(model_dir, f) for f in os.listdir(model_dir)
                                               if f.find(".stats") == -1]
     process_pool = multiprocessing.Pool(processes=min(4, len(model_files)))
-    evaluation_results = process_pool.map(
-        RunEvaluateModel,
-        [[("model_file", f)] + kwargs_items for f in model_files])
 
-    process_pool.close()
-    process_pool.join()
+    message = "evaluating all models in directory: %s" % (model_dir)
+    with progress_bar.ProgressBar(
+        len(model_files), start_message=message, bar_color="yellow",
+        verbose=True) as bar:
+        evaluation_results = process_pool.map(
+            RunEvaluateModel,
+            [[("model_file", f), ("bar", bar)] + kwargs_items
+             for f in model_files])
+
+        process_pool.close()
+        process_pool.join()
 
     # Sort models by average score.
     for evaluation_result in evaluation_results:
