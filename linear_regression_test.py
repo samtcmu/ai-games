@@ -2,9 +2,9 @@ import linear_regression
 import math_util
 import random
 
-def LinearRegressionTest():
+def LinearRegressionTest(verbose=True):
     expected_weights = [200.0, 10.0, 200.0, -43.0, 1.0, -314.0]
-    noise_stdev = 5.0
+    noise_stdev = 1.0
     training_data = CreateTrainingData(
         expected_weights, 1000, -100.0, 100.0, noise_stdev=noise_stdev)
     test_data = CreateTrainingData(
@@ -16,11 +16,12 @@ def LinearRegressionTest():
                 learning_rate=0.000001,
                 learning_iterations=10000,
                 regularization_rate=0.0,
-                verbose=True)
+                verbose=verbose)
 
     total_difference = 0
     for t in test_data:
         total_difference += abs(model.Infer(t[0]) - t[1])
+    print "learned model: %s" % (model,)
     print "average absolute difference on test data: %.3f" % (
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)

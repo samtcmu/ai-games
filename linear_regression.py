@@ -10,9 +10,8 @@ class LinearRegression:
         return "[%s]" % (", ".join("%.3f" % (w) for w in self._weights))
 
     def RandomizeWeights(self, random_range=(-1.0, 1.0)):
-        for i in range(self._inputs):
-            self._weights[i] = random.uniform(
-                random_range[0], random_range[1])
+        self._weights = [random.uniform(random_range[0], random_range[1])
+                         for _ in self._weights]
 
     def Infer(self, inputs):
         return self._Infer([-1.0] + inputs)
@@ -20,24 +19,12 @@ class LinearRegression:
     def _Infer(self, inputs):
         return math_util.VectorDotProduct(self._weights, inputs)
 
-    def Fitness(self, training_data, classifications):
-        output = 0.0
-        for t, c in zip(training_data, classifications):
-            output += (-0.5 * (t[1] - c)**2)
-        return output
+    def Fitness(self, training_data):
+        return sum(-0.5 * (t[1] - self._Infer(t[0]))**2 for t in training_data)
 
-    def _PartialDerivative(self, training_data, classifications, i, verbose=False):
-        weight_partial_derivative = 0.0
-        for t, c in zip(training_data, classifications):
-            weight_partial_derivative += (t[1] - c) * t[0][i]
-        return weight_partial_derivative
-
-    def _WeightsGradient(self, training_data, classifications, verbose=False):
-        weights_gradient = [0.0 for _ in self._weights]
-        for i in range(len(weights_gradient)):
-            weights_gradient[i] = self._PartialDerivative(
-                training_data, classifications, i, verbose=verbose)
-        return weights_gradient
+    def _WeightsGradient(self, t, learning_rate):
+        return math_util.VectorScalarProduct(
+            learning_rate * (t[1] - self._Infer(t[0])), t[0])
 
     def _RegularizationGradient(self, regularization_rate):
         return math_util.VectorScalarProduct(
@@ -56,19 +43,13 @@ class LinearRegression:
         for k in range(learning_iterations):
             random.shuffle(training_data)
             if verbose:
-                current_classifications = [self._Infer(t[0]) for t in training_data]
-                current_fitness = self.Fitness(training_data,
-                                               current_classifications)
+                current_fitness = self.Fitness(training_data)
                 print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
                 print "model(%4d): %s" % (k, self)
 
             for t in training_data:
-                weights_gradient = self._WeightsGradient(
-                    [t], [self._Infer(t[0])], verbose=False)
                 self._weights = math_util.VectorSum(
-                    self._weights,
-                    math_util.VectorScalarProduct(
-                        learning_rate, weights_gradient))
+                    self._weights, self._WeightsGradient(t, learning_rate))
 
             self._weights = math_util.VectorDifference(
                 self._weights,
