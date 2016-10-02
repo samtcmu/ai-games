@@ -43,7 +43,7 @@ class NeuralNetwork:
         return self._Infer(inputs)[-1][1:]
 
     @staticmethod
-    def _Sigmoid(x, l, depth):
+    def ActivationFunction(x, l, depth):
         # Applies the Sigmoid function at all layers of the neural network
         # besides the final layer which will simply be a linear layer (i.e.
         # this function will just be the identity function).
@@ -56,24 +56,24 @@ class NeuralNetwork:
         outputs = [current_layer_inputs[0]]
         for l in range(depth):
             current_layer_ouputs = [
-                [NeuralNetwork._Sigmoid(x, l, depth) for x in row]
+                [NeuralNetwork.ActivationFunction(x, l, depth) for x in row]
                 for row in math_util.MatrixMult(current_layer_inputs,
                                                 self._weights[l])]
             outputs.append([-1.0] + current_layer_ouputs[0])
             current_layer_inputs = [[-1.0] + current_layer_ouputs[0]]
         return outputs
 
-    def Fitness(self, training_data, classifications, k, verbose=False):
+    def Fitness(self, training_data, k, verbose=False):
+        magnitude = math_util.VectorMagnitude
+        diff = math_util.VectorDifference
+        message = "training iteration %d: computing model fitness" % (k,)
         with progress_bar.ProgressBar(
-            len(training_data),
-            start_message="learnnig iteration %d: comptuting model fitness" % (k,),
-            bar_color="green", verbose=verbose) as bar:
-            output = 0.0
-            for t, c in zip(training_data, classifications):
-                output += (-0.5 * math_util.VectorMagnitude(
-                           math_util.VectorDifference(t[1], c[-1][1:]))**2)
-                bar.Increment()
-            return output
+            len(training_data), start_message=message, bar_color="yellow",
+            verbose=verbose) as bar:
+            return sum(
+                [-0.5 * magnitude(diff(t[1], self.Infer(t[0])))**2,
+                 bar.Increment()][0]
+                for t in training_data)
 
     def _WeightsGradientForSingleTrainingExample(self, t, c, verbose=False):
         weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
@@ -121,30 +121,28 @@ class NeuralNetwork:
             2 * regularization_rate, self._weights[l])
 
     def Train(self, training_data, learning_rate=1.0, learning_iterations=10,
-              regularization_rate=0.0, verbose=False):
+              regularization_rate=0.0, model_path_prefix=None, verbose=False,
+              show_progress_bars=False):
         for k in range(learning_iterations):
             random.shuffle(training_data)
 
             if verbose:
-                current_classifications = []
-                with progress_bar.ProgressBar(
-                    len(training_data),
-                    start_message="training iteratoin %d: running inference" % (k,),
-                    bar_color="yellow", verbose=verbose) as bar:
-                    current_classifications = [
-                        [self._Infer(t[0]), bar.Increment()][0] for t in training_data]
-                current_fitness = self.Fitness(training_data,
-                                               current_classifications,
-                                               k, verbose=verbose)
+                current_fitness = self.Fitness(
+                    training_data, k, show_progress_bars)
                 print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
-                # with open("output/mnist/nn-model-%d.txt" % (k), "w") as model_file:
-                #     pickle.dump(self, model_file)
-                print "model(%4d): \n%s" % (k, self)
+                # print "model(%4d): \n%s" % (k, self)
+
+            if model_path_prefix:
+                model_file_path = "%s-%d.txt" % (model_path_prefix, k)
+                if verbose:
+                    print "model(%4d): saving to %s" % (k, model_file_path)
+                with open(model_file_path, "w") as model_file:
+                    pickle.dump(self, model_file)
 
             with progress_bar.ProgressBar(
                 len(training_data),
                 start_message="training iteration %d: running gradient descent" % (k,),
-                bar_color="cyan", verbose=verbose) as bar:
+                bar_color="cyan", verbose=show_progress_bars) as bar:
                 for t in training_data:
                     # TODO(samt): Since we are running stochastic gradient descent
                     # here we should call _WeightsGradientForSingleTrainingExample.
