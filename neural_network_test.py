@@ -49,7 +49,7 @@ def NeuralNetworkTest():
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)
 
-def MnistTest(verbose=False):
+def MnistTest(model_path_prefix="output/mnist/nn-model", verbose=False):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
 
     validation_data = training_data[-len(training_data) / 6:]
@@ -65,13 +65,13 @@ def MnistTest(verbose=False):
     model = neural_network.NeuralNetwork(
         input_width=len(transformed_training_data[0][0]),
         output_width=len(transformed_training_data[0][1]),
-        hidden_layer_widths=[15])
+        hidden_layer_widths=[30])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(transformed_training_data,
-                learning_rate=0.1,
+                learning_rate=0.05,
                 learning_iterations=100,
                 regularization_rate=0.001,
-                model_path_prefix="output/mnist/nn-model",
+                model_path_prefix=model_path_prefix,
                 verbose=verbose,
                 show_progress_bars=verbose)
 
