@@ -129,13 +129,15 @@ class NeuralNetwork:
             if verbose:
                 current_fitness = self.Fitness(
                     training_data, k, show_progress_bars)
-                print "fitness(%4d): %s" % (k, "{:,.8f}".format(current_fitness))
+                print "training iteration %d: model fittness = %s" % (
+                    k, "{:,.8f}".format(current_fitness))
                 # print "model(%4d): \n%s" % (k, self)
 
             if model_path_prefix:
                 model_file_path = "%s-%d.txt" % (model_path_prefix, k)
                 if verbose:
-                    print "model(%4d): saving to %s" % (k, model_file_path)
+                    print "training iteration %d: saving current model to %s" % (
+                        k, model_file_path)
                 with open(model_file_path, "w") as model_file:
                     pickle.dump(self, model_file)
 
