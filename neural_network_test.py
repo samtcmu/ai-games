@@ -68,10 +68,12 @@ def MnistTest(verbose=False):
         hidden_layer_widths=[15])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(transformed_training_data,
-                learning_rate=0.001,
+                learning_rate=0.1,
                 learning_iterations=100,
                 regularization_rate=0.001,
-                verbose=True)
+                model_path_prefix="output/mnist/nn-model",
+                verbose=verbose,
+                show_progress_bars=verbose)
 
 def EvaluateNeuralNetworkOnMnist(model_file_path, verbose=False):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
