@@ -31,9 +31,9 @@ def NeuralNetworkTest():
                                          hidden_layer_widths=[4])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(training_data,
-                learning_rate=0.001,
-                learning_iterations=4000,
-                regularization_rate=0.0001,
+                learning_rate=0.004,
+                learning_iterations=10000,
+                regularization_rate=0.0,
                 verbose=True)
 
     total_difference = 0
