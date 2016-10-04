@@ -12,8 +12,8 @@ class ProgressBar:
                  bar_color="yellow", verbose=True):
         self._total_tasks = total_tasks
         self._completed_tasks = 0 
-        self._quantas = quantas
-        self._quanta_size = self._total_tasks / self._quantas
+        self._quantas = quantas if quantas <= total_tasks else total_tasks
+        self._quanta_size = max(1, self._total_tasks / self._quantas)
         self._start_message = start_message
         self._bar_color = bar_color
         self._verbose = verbose
@@ -25,9 +25,11 @@ class ProgressBar:
         self._completed_tasks = 0
 
         if self._verbose:
-            print self._start_message
-            print "[" + ("{:^%d}" % (self._quantas,)).format("progress") + "]\n",
-            print "[",
+            if self._start_message:
+                sys.stdout.write(self._start_message + "\n")
+            sys.stdout.write("[" + ("{:^%d}" % (self._quantas,)).format("progress") + "]\n")
+            sys.stdout.write("[")
+            sys.stdout.flush()
 
         return self
 
