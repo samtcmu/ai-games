@@ -1,0 +1,7 @@
+python -c 'import neural_network_test; neural_network_test.EvaluateNeuralNetworkOnMnist("output/mnist-0.05-0.001/nn-model-92.txt", verbose=True)'
+
+evaluating validation data with model: output/mnist-0.05-0.001/nn-model-92.txt
+performance on validation data: 9589 / 10000 (95.89 %)
+
+evaluating training data with model: output/mnist-0.05-0.001/nn-model-92.txt
+performance on training data: 49030 / 50000 (98.06 %)
