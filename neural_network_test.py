@@ -17,7 +17,7 @@ def InverseSigmoid(x):
         # (1.0 / x) - 1.0 == 0.0
         return 2000.0
 
-def NeuralNetworkTest():
+def NeuralNetworkTest(learning_iterations=10000, verbose=True):
     noise_stdev = 5.0
     inputs = 6
     weights = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -28,28 +28,30 @@ def NeuralNetworkTest():
 
     model = neural_network.NeuralNetwork(input_width=len(weights) - 1,
                                          output_width=1,
-                                         hidden_layer_widths=[4])
+                                         hidden_layer_widths=[16])
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(training_data,
                 learning_rate=0.004,
-                learning_iterations=10000,
+                learning_iterations=learning_iterations,
                 regularization_rate=0.0,
-                verbose=True)
+                verbose=verbose)
 
     total_difference = 0
     for t in test_data:
         actual = InverseSigmoid(model.Infer(t[0])[0])
         expected = InverseSigmoid(t[1][0])
         difference = abs(actual - expected)
-        print "%s %s %s" % ("{0:9,.4f}".format(actual),
-                            "{0:9,.4f}".format(expected),
-                            "{0:9,.4f}".format(difference))
+        if verbose:
+            print "%s %s %s" % ("{0:9,.4f}".format(actual),
+                                "{0:9,.4f}".format(expected),
+                                "{0:9,.4f}".format(difference))
         total_difference += difference
     print "average absolute difference on test data: %.3f" % (
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)
 
-def MnistTest(model_path_prefix="output/mnist/nn-model", verbose=False):
+def MnistTest(model_path_prefix="output/mnist/nn-model", verbose=False,
+              show_progress_bars=True):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
 
     validation_data = training_data[-len(training_data) / 6:]
@@ -73,7 +75,7 @@ def MnistTest(model_path_prefix="output/mnist/nn-model", verbose=False):
                 regularization_rate=0.001,
                 model_path_prefix=model_path_prefix,
                 verbose=verbose,
-                show_progress_bars=verbose)
+                show_progress_bars=show_progress_bars)
 
 def EvaluateNeuralNetworkOnMnist(model_file_path, verbose=False):
     training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
