@@ -91,7 +91,7 @@ class NeuralNetwork:
                     common_weight_gradient = 0.0
                     for k in range(1, self._layer_widths[l + 1] + 1):
                         common_weight_gradient += (
-                            self.Weight(l + 1, k, i) *
+                            self._weights[l][i][k - 1] *
                             weights_gradient[l][i][k - 1])
                     common_weight_gradient *= (1.0 - c[l][i])
 
