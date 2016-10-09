@@ -2,10 +2,12 @@
 *.pyc
 output/mnist/
 output/ga-model/
+output/profiling/
 output/ql-model/
 output/rl-model/
 output/sql-model/
 output/ga-model/*
+output/profiling/*
 output/ql-model/*
 output/rl-model/*
 output/sql-model/*

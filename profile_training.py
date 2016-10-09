@@ -1,7 +1,5 @@
-import picking_cans
+import neural_network_test
 
-picking_cans.shallow_q_learning(
-    random_wall=False,
-    agent_state_type="radius-two",
-    games=200
-)
+neural_network_test.NeuralNetworkTest(
+    learning_iterations=200,
+    verbose=False)
