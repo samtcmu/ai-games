@@ -75,11 +75,12 @@ class NeuralNetwork:
                  bar.Increment()][0]
                 for t in training_data)
 
-    def _WeightsGradientForSingleTrainingExample(self, t, c, verbose=False):
+    def _WeightsGradient(self, t):
         weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
                                   for j in range(self._layer_widths[l - 1] + 1)]
                                   for l in range(1, len(self._layer_widths))]
 
+        c = self._Infer(t[0])
         for l in range(len(self._layer_widths) - 1, 0, -1):
             for i in range(1, self._layer_widths[l] + 1):
                 common_weight_gradient = 0.0
@@ -97,22 +98,6 @@ class NeuralNetwork:
                 for j in range(self._layer_widths[l - 1] + 1):
                     weights_gradient[l - 1][j][i - 1] = (
                         common_weight_gradient * c[l - 1][j])
-
-        return weights_gradient
-
-    def _WeightsGradient(self, training_data, classifications, verbose=False):
-        weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
-                                  for j in range(self._layer_widths[l - 1] + 1)]
-                                  for l in range(1, len(self._layer_widths))]
-
-        for t, c in zip(training_data, classifications):
-            weights_gradient_for_training_example = (
-                self._WeightsGradientForSingleTrainingExample(
-                    t, c, verbose=verbose))
-            for l in range(len(self._weights)):
-                weights_gradient[l] = math_util.MatrixSum(
-                    weights_gradient[l],
-                    weights_gradient_for_training_example[l])
 
         return weights_gradient
 
@@ -146,10 +131,7 @@ class NeuralNetwork:
                 start_message="training iteration %d: running gradient descent" % (k,),
                 bar_color="cyan", verbose=show_progress_bars) as bar:
                 for t in training_data:
-                    # TODO(samt): Since we are running stochastic gradient descent
-                    # here we should call _WeightsGradientForSingleTrainingExample.
-                    weights_gradient = self._WeightsGradient(
-                        [t], [self._Infer(t[0])], verbose=False)
+                    weights_gradient = self._WeightsGradient(t)
 
                     for l in range(len(self._weights)):
                         self._weights[l] = math_util.MatrixSum(
