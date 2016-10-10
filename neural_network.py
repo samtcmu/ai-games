@@ -114,8 +114,8 @@ class NeuralNetwork:
 
             if verbose:
                 current_fitness = self.Fitness(
-                    training_data, k, show_progress_bars)
-                print "training iteration %d: model fittness = %s" % (
+                    training_data, k, verbose=show_progress_bars)
+                print "training iteration %d: model fitness = %s" % (
                     k, "{:,.8f}".format(current_fitness))
                 # print "model(%4d): \n%s" % (k, self)
 

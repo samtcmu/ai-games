@@ -104,6 +104,8 @@ def EvaluateNeuralNetworkOnMnist(model_file_path, verbose=False):
                                data_name="training data",
                                model_name=model_file_path,
                                verbose=verbose)
+    print "model fitness: {:12,.4f}".format(
+        model.Fitness(transformed_training_data, 0, verbose=verbose))
 
 def EvaluateMnistDataWithModel(mnist_data, model, data_name="mnist-data",
                                model_name="model", verbose=False):
