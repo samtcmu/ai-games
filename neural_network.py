@@ -42,21 +42,13 @@ class NeuralNetwork:
     def Infer(self, inputs):
         return self._Infer(inputs)[-1][1:]
 
-    @staticmethod
-    def ActivationFunction(x, l, depth):
-        # Applies the Sigmoid function at all layers of the neural network
-        # besides the final layer which will simply be a linear layer (i.e.
-        # this function will just be the identity function).
-        # return math_util.Sigmoid(x) if l < (depth - 1) else x
-        return math_util.Sigmoid(x)
-
     def _Infer(self, inputs):
         depth = len(self._weights)
         current_layer_inputs = [[-1.0] + inputs]
         outputs = [current_layer_inputs[0]]
         for l in range(depth):
             current_layer_ouputs = [
-                [NeuralNetwork.ActivationFunction(x, l, depth) for x in row]
+                [math_util.Sigmoid(x) for x in row]
                 for row in math_util.MatrixMult(current_layer_inputs,
                                                 self._weights[l])]
             outputs.append([-1.0] + current_layer_ouputs[0])
