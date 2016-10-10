@@ -46,7 +46,7 @@ class NeuralNetwork:
         depth = len(self._weights)
         current_layer_inputs = [[-1.0] + inputs]
         outputs = [current_layer_inputs[0]]
-        for l in range(depth):
+        for l in xrange(depth):
             current_layer_ouputs = [
                 [math_util.Sigmoid(x) for x in row]
                 for row in math_util.MatrixMult(current_layer_inputs,
@@ -68,13 +68,13 @@ class NeuralNetwork:
                 for t in training_data)
 
     def _WeightsGradient(self, t, learning_rate):
-        weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
-                                  for j in range(self._layer_widths[l - 1] + 1)]
-                                  for l in range(1, len(self._layer_widths))]
+        weights_gradient = [[[0.0 for i in xrange(self._layer_widths[l])]
+                                  for j in xrange(self._layer_widths[l - 1] + 1)]
+                                  for l in xrange(1, len(self._layer_widths))]
 
         c = self._Infer(t[0])
-        for l in range(len(self._layer_widths) - 1, 0, -1):
-            for i in range(1, self._layer_widths[l] + 1):
+        for l in xrange(len(self._layer_widths) - 1, 0, -1):
+            for i in xrange(1, self._layer_widths[l] + 1):
                 common_weight_gradient = 0.0
                 if l == len(self._layer_widths) - 1:
                     common_weight_gradient = (
@@ -82,13 +82,13 @@ class NeuralNetwork:
                         learning_rate)
                 if l < len(self._layer_widths) - 1:
                     common_weight_gradient = 0.0
-                    for k in range(1, self._layer_widths[l + 1] + 1):
+                    for k in xrange(1, self._layer_widths[l + 1] + 1):
                         common_weight_gradient += (
                             self._weights[l][i][k - 1] *
                             weights_gradient[l][i][k - 1])
                     common_weight_gradient *= (1.0 - c[l][i])
 
-                for j in range(self._layer_widths[l - 1] + 1):
+                for j in xrange(self._layer_widths[l - 1] + 1):
                     weights_gradient[l - 1][j][i - 1] = (
                         common_weight_gradient * c[l - 1][j])
 
@@ -101,7 +101,7 @@ class NeuralNetwork:
     def Train(self, training_data, learning_rate=1.0, learning_iterations=10,
               regularization_rate=0.0, model_path_prefix=None, verbose=False,
               show_progress_bars=False):
-        for k in range(learning_iterations):
+        for k in xrange(learning_iterations):
             random.shuffle(training_data)
 
             if verbose:
