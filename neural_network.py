@@ -102,9 +102,9 @@ class NeuralNetwork:
 
         return weights_gradient
 
-    def _RegularizationGradient(self, l, regularization_rate):
-        return math_util.MatrixScalarProduct(
-            2 * regularization_rate, self._weights[l])
+    def _RegularizationGradient(self, regularization_rate):
+        return math_util.TensorScalarProduct(
+            2 * regularization_rate, self._weights)
 
     def Train(self, training_data, learning_rate=1.0, learning_iterations=10,
               regularization_rate=0.0, model_path_prefix=None, verbose=False,
@@ -132,18 +132,12 @@ class NeuralNetwork:
                 start_message="training iteration %d: running gradient descent" % (k,),
                 bar_color="cyan", verbose=show_progress_bars) as bar:
                 for t in training_data:
-                    weights_gradient = self._WeightsGradient(t, learning_rate)
-
-                    for l in range(len(self._weights)):
-                        self._weights[l] = math_util.MatrixSum(
-                            self._weights[l],
-                            weights_gradient[l])
-
+                    math_util.TensorSum(
+                        self._weights,
+                        self._WeightsGradient(t, learning_rate))
                     bar.Increment()
 
             # Apply L2 Regularization to self._weights.
-            for l in range(len(self._weights)):
-                regularization_gradient = self._RegularizationGradient(
-                    l, regularization_rate)
-                self._weights[l] = math_util.MatrixDifference(
-                    self._weights[l], regularization_gradient)
+            math_util.TensorDifference(
+                self._weights,
+                self._RegularizationGradient(regularization_rate))

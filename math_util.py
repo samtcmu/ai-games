@@ -44,6 +44,23 @@ def MatrixScalarProduct(c, A):
     return [[c * A[i][j] for j in range(len(A[0]))]
                          for i in range(len(A))]
 
+def TensorSum(A, B):
+    for i in range(len(A)):
+        for j in range(len(A[i])):
+            for k in range(len(A[i][j])):
+                A[i][j][k] += B[i][j][k]
+
+def TensorDifference(A, B):
+    for i in range(len(A)):
+        for j in range(len(A[i])):
+            for k in range(len(A[i][j])):
+                A[i][j][k] -= B[i][j][k]
+
+def TensorScalarProduct(c, A):
+    return [[[c * A[i][j][k] for k in range(len(A[i][j]))]
+                             for j in range(len(A[i]))]
+                             for i in range(len(A))]
+
 def Sigmoid(x):
     try:
         return (1.0 / (1.0 + math.exp(-1.0 * x)))
