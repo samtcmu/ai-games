@@ -75,7 +75,7 @@ class NeuralNetwork:
                  bar.Increment()][0]
                 for t in training_data)
 
-    def _WeightsGradient(self, t):
+    def _WeightsGradient(self, t, learning_rate):
         weights_gradient = [[[0.0 for i in range(self._layer_widths[l])]
                                   for j in range(self._layer_widths[l - 1] + 1)]
                                   for l in range(1, len(self._layer_widths))]
@@ -86,7 +86,8 @@ class NeuralNetwork:
                 common_weight_gradient = 0.0
                 if l == len(self._layer_widths) - 1:
                     common_weight_gradient = (
-                        (t[1][i - 1] - c[l][i]) * c[l][i] * (1.0 - c[l][i]))
+                        (t[1][i - 1] - c[l][i]) * c[l][i] * (1.0 - c[l][i]) *
+                        learning_rate)
                 if l < len(self._layer_widths) - 1:
                     common_weight_gradient = 0.0
                     for k in range(1, self._layer_widths[l + 1] + 1):
@@ -131,13 +132,12 @@ class NeuralNetwork:
                 start_message="training iteration %d: running gradient descent" % (k,),
                 bar_color="cyan", verbose=show_progress_bars) as bar:
                 for t in training_data:
-                    weights_gradient = self._WeightsGradient(t)
+                    weights_gradient = self._WeightsGradient(t, learning_rate)
 
                     for l in range(len(self._weights)):
                         self._weights[l] = math_util.MatrixSum(
                             self._weights[l],
-                            math_util.MatrixScalarProduct(
-                                learning_rate, weights_gradient[l]))
+                            weights_gradient[l])
 
                     bar.Increment()
 
