@@ -25,11 +25,14 @@ def MatrixTranspose(A):
     return output
 
 def MatrixMult(A, B):
-    assert len(A[0]) == len(B), "len(A[0]) = %d, len(B) = %d" % (len(A[0]), len(B))
-    output = [[0.0 for j in xrange(len(B[0]))] for i in xrange(len(A))]
-    for i in xrange(len(A)):
-        for j in xrange(len(B[0])):
-            for k in xrange(len(A[i])):
+    rows_A, cols_A = len(A), len(A[0])
+    rows_B, cols_B = len(B), len(B[0])
+
+    assert cols_A == rows_B, "len(A[0]) = %d, len(B) = %d" % (cols_A, rows_B)
+    output = [[0.0 for j in xrange(cols_B)] for i in xrange(rows_A)]
+    for i in xrange(rows_A):
+        for j in xrange(cols_B):
+            for k in xrange(cols_A):
                 output[i][j] += A[i][k] * B[k][j]
     return output
 
@@ -46,14 +49,16 @@ def MatrixScalarProduct(c, A):
 
 def TensorSum(A, B):
     for i in xrange(len(A)):
+        len_A_i_j = len(A[i][0])
         for j in xrange(len(A[i])):
-            for k in xrange(len(A[i][j])):
+            for k in xrange(len_A_i_j):
                 A[i][j][k] += B[i][j][k]
 
 def TensorDifference(A, B):
     for i in xrange(len(A)):
+        len_A_i_j = len(A[i][0])
         for j in xrange(len(A[i])):
-            for k in xrange(len(A[i][j])):
+            for k in xrange(len_A_i_j):
                 A[i][j][k] -= B[i][j][k]
 
 def TensorScalarProduct(c, A):
