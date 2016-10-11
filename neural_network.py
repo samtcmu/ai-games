@@ -43,16 +43,17 @@ class NeuralNetwork:
         return self._Infer(inputs)[-1][1:]
 
     def _Infer(self, inputs):
+        # TODO(samt): Cache the result of this call as an instance variable.
         depth = len(self._weights)
-        current_layer_inputs = [[-1.0] + inputs]
-        outputs = [current_layer_inputs[0]]
+        current_layer_inputs = [-1.0] + inputs
+        outputs = [current_layer_inputs]
         for l in xrange(depth):
-            current_layer_ouputs = math_util.MatrixTranspose([
-                [math_util.Sigmoid(x) for x in row]
-                for row in math_util.MatrixMult(self._weights[l],
-                                                math_util.MatrixTranspose(current_layer_inputs))])
-            outputs.append([-1.0] + current_layer_ouputs[0])
-            current_layer_inputs = [[-1.0] + current_layer_ouputs[0]]
+            current_layer_ouputs = [
+                math_util.Sigmoid(x)
+                for x in math_util.MatrixVectorMult(self._weights[l],
+                                                    current_layer_inputs)]
+            current_layer_inputs = [-1.0] + current_layer_ouputs
+            outputs.append(current_layer_inputs)
         return outputs
 
     def Fitness(self, training_data, k, verbose=False):

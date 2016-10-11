@@ -44,7 +44,7 @@ def MatrixVectorMult(A, b):
     output = [0.0 for _ in xrange(rows_A)]
     for i in xrange(rows_A):
         for j in xrange(rows_b):
-            output[i][j] += A[i][j] * b[j]
+            output[i] += A[i][j] * b[j]
 
     return output
 
