@@ -36,6 +36,18 @@ def MatrixMult(A, B):
                 output[i][j] += A[i][k] * B[k][j]
     return output
 
+def MatrixVectorMult(A, b):
+    rows_A, cols_A = len(A), len(A[0])
+    rows_b = len(b)
+
+    assert cols_A == rows_b, "len(A[0]) = %d, len(b) = %d" % (cols_A, rows_b)
+    output = [0.0 for _ in xrange(rows_A)]
+    for i in xrange(rows_A):
+        for j in xrange(rows_b):
+            output[i][j] += A[i][j] * b[j]
+
+    return output
+
 def MatrixSum(A, B):
     return [[A[i][j] + B[i][j] for j in xrange(len(A[0]))]
                                for i in xrange(len(A))]

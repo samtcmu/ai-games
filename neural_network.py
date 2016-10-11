@@ -10,17 +10,17 @@ class NeuralNetwork:
         self._layer_widths = (
             [self._input_width] + hidden_layer_widths + [self._output_width])
 
-        self._weights = [[[0.0 for i in range(self._layer_widths[l])]
-                               for j in range(self._layer_widths[l - 1] + 1)]
+        self._weights = [[[0.0 for j in range(self._layer_widths[l - 1] + 1)]
+                               for i in range(self._layer_widths[l])]
                                for l in range(1, len(self._layer_widths))]
 
     def __str__(self):
         output = ""
         for l in range(len(self._weights)):
             output += "layer %d:\n" % (l + 1,)
-            for i in range(len(self._weights[l][0])):
-                output += "  neuron %d: " % (i + 1,)
-                for j in range(len(self._weights[l])):
+            for i in range(len(self._weights[l])):
+                output += "  neuron %d:" % (i + 1,)
+                for j in range(len(self._weights[l][i])):
                     # TODO(samt): Adjust the width based on the maximum weight.
                     output += "{0:8.5f}".format(self._weights[l][j][i],) + " "
                 output += "\n"
@@ -30,13 +30,13 @@ class NeuralNetwork:
         assert 1 <= l <= len(self._layer_widths) - 1
         assert 1 <= i <= self._layer_widths[l]
         assert 0 <= j <= self._layer_widths[l - 1]
-        return self._weights[l - 1][j][i - 1]
+        return self._weights[l - 1][i - 1][j]
 
     def RandomizeWeights(self, random_range=(-1.0, 1.0)):
         for l in range(len(self._weights)):
-            for j in range(len(self._weights[l])):
-                for i in range(len(self._weights[l][j])):
-                    self._weights[l][j][i] = random.uniform(
+            for i in range(len(self._weights[l])):
+                for j in range(len(self._weights[l][i])):
+                    self._weights[l][i][j] = random.uniform(
                         random_range[0], random_range[1])
 
     def Infer(self, inputs):
@@ -47,10 +47,10 @@ class NeuralNetwork:
         current_layer_inputs = [[-1.0] + inputs]
         outputs = [current_layer_inputs[0]]
         for l in xrange(depth):
-            current_layer_ouputs = [
+            current_layer_ouputs = math_util.MatrixTranspose([
                 [math_util.Sigmoid(x) for x in row]
-                for row in math_util.MatrixMult(current_layer_inputs,
-                                                self._weights[l])]
+                for row in math_util.MatrixMult(self._weights[l],
+                                                math_util.MatrixTranspose(current_layer_inputs))])
             outputs.append([-1.0] + current_layer_ouputs[0])
             current_layer_inputs = [[-1.0] + current_layer_ouputs[0]]
         return outputs
@@ -69,8 +69,8 @@ class NeuralNetwork:
 
     def _WeightsGradient(self, t, learning_rate):
         last_layer_index = len(self._layer_widths) - 1
-        weights_gradient = [[[0.0 for i in xrange(self._layer_widths[l])]
-                                  for j in xrange(self._layer_widths[l - 1] + 1)]
+        weights_gradient = [[[0.0 for j in xrange(self._layer_widths[l - 1] + 1)]
+                                  for i in xrange(self._layer_widths[l])]
                                   for l in xrange(1, last_layer_index + 1)]
 
         c = self._Infer(t[0])
@@ -90,12 +90,12 @@ class NeuralNetwork:
                     common_weight_gradient = 0.0
                     for k in xrange(1, previous_layer_width_plus_one):
                         common_weight_gradient += (
-                            self._weights[l][i][k - 1] *
-                            weights_gradient[l][i][k - 1])
+                            self._weights[l][k - 1][i] *
+                            weights_gradient[l][k - 1][i])
                     common_weight_gradient *= (1.0 - c[l][i])
 
                 for j in xrange(next_layer_width_plus_one):
-                    weights_gradient[l - 1][j][i - 1] = (
+                    weights_gradient[l - 1][i - 1][j] = (
                         common_weight_gradient * c[l - 1][j])
 
         return weights_gradient
