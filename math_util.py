@@ -63,6 +63,7 @@ def TensorScalarProduct(c, A):
 
 def Sigmoid(x):
     try:
-        return (1.0 / (1.0 + math.exp(-1.0 * x)))
+        y = math.exp(x)
+        return y / (y + 1.0)
     except OverflowError:
         return 1.0 if x > 0 else 0.0
