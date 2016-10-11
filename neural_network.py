@@ -68,27 +68,33 @@ class NeuralNetwork:
                 for t in training_data)
 
     def _WeightsGradient(self, t, learning_rate):
+        last_layer_index = len(self._layer_widths) - 1
         weights_gradient = [[[0.0 for i in xrange(self._layer_widths[l])]
                                   for j in xrange(self._layer_widths[l - 1] + 1)]
-                                  for l in xrange(1, len(self._layer_widths))]
+                                  for l in xrange(1, last_layer_index + 1)]
 
         c = self._Infer(t[0])
-        for l in xrange(len(self._layer_widths) - 1, 0, -1):
-            for i in xrange(1, self._layer_widths[l] + 1):
+        for l in xrange(last_layer_index, 0, -1):
+            current_layer_width_plus_one = self._layer_widths[l] + 1
+            next_layer_width_plus_one = self._layer_widths[l - 1] + 1
+            if l < last_layer_index:
+                previous_layer_width_plus_one = self._layer_widths[l + 1] + 1
+
+            for i in xrange(1, current_layer_width_plus_one):
                 common_weight_gradient = 0.0
-                if l == len(self._layer_widths) - 1:
+                if l == last_layer_index:
                     common_weight_gradient = (
                         (t[1][i - 1] - c[l][i]) * c[l][i] * (1.0 - c[l][i]) *
                         learning_rate)
-                if l < len(self._layer_widths) - 1:
+                else:
                     common_weight_gradient = 0.0
-                    for k in xrange(1, self._layer_widths[l + 1] + 1):
+                    for k in xrange(1, previous_layer_width_plus_one):
                         common_weight_gradient += (
                             self._weights[l][i][k - 1] *
                             weights_gradient[l][i][k - 1])
                     common_weight_gradient *= (1.0 - c[l][i])
 
-                for j in xrange(self._layer_widths[l - 1] + 1):
+                for j in xrange(next_layer_width_plus_one):
                     weights_gradient[l - 1][j][i - 1] = (
                         common_weight_gradient * c[l - 1][j])
 
