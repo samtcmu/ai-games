@@ -26,7 +26,7 @@ def MatrixTranspose(A):
 
 def MatrixMult(A, B):
     assert len(A[0]) == len(B), "len(A[0]) = %d, len(B) = %d" % (len(A[0]), len(B))
-    output = [[0.0 for j in range(len(B[0]))] for i in xrange(len(A))]
+    output = [[0.0 for j in xrange(len(B[0]))] for i in xrange(len(A))]
     for i in xrange(len(A)):
         for j in xrange(len(B[0])):
             for k in xrange(len(A[i])):
