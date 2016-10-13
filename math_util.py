@@ -4,6 +4,15 @@ def VectorDotProduct(A, B):
     assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
     return sum(A[i] * B[i] for i in xrange(len(A)))
 
+def VectorHadamardProduct(A, B):
+    assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
+    return [A[i] * B[i] for i in xrange(len(A))]
+
+def VectorHadamardProduct3(A, B, C):
+    assert len(A) == len(B) == len(C), "len(A) = %d, len(B) = %d, len(C) = %d" % (
+        len(A), len(B), len(C))
+    return [A[i] * B[i] * C[i] for i in xrange(len(A))]
+
 def VectorScalarProduct(c, A):
     return [c * A[i] for i in xrange(len(A))]
 
@@ -48,6 +57,18 @@ def MatrixVectorMult(A, b):
 
     return output
 
+def MatrixHadamardProduct(A, B):
+    rows_A, cols_A = len(A), len(A[0])
+    rows_B, cols_B = len(B), len(B[0])
+    assert (rows_A == rows_B) and (cols_A == cols_B), (
+        "A = %d x %d, B = %d x %d" % (rows_A, cols_A, rows_B, cols_B))
+
+    output = [[0.0 for _ in r] for r in A]
+    for i in xrange(rows_A):
+        for j in xrange(cols_A):
+            output[i][j] = A[i][j] * B[i][j]
+    return output
+
 def MatrixSum(A, B):
     return [[A[i][j] + B[i][j] for j in xrange(len(A[0]))]
                                for i in xrange(len(A))]
@@ -84,3 +105,11 @@ def Sigmoid(x):
         return y / (y + 1.0)
     except OverflowError:
         return 1.0 if x > 0 else 0.0
+
+def MatrixAsString(A, fmt=None):
+    output = ""
+    for r in xrange(len(A)):
+        for c in xrange(len(A[r])):
+            output += fmt.format(A[r][c])
+        output += "\n"
+    return output

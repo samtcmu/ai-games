@@ -70,34 +70,28 @@ class NeuralNetwork:
 
     def _WeightsGradient(self, t, learning_rate):
         last_layer_index = len(self._layer_widths) - 1
-        weights_gradient = [[[0.0 for j in xrange(self._layer_widths[l - 1] + 1)]
-                                  for i in xrange(self._layer_widths[l])]
-                                  for l in xrange(1, last_layer_index + 1)]
+        weights_gradient = [None for l in xrange(1, len(self._layer_widths))]
 
         c = self._Infer(t[0])
         for l in xrange(last_layer_index, 0, -1):
-            current_layer_width_plus_one = self._layer_widths[l] + 1
-            next_layer_width_plus_one = self._layer_widths[l - 1] + 1
-            if l < last_layer_index:
-                previous_layer_width_plus_one = self._layer_widths[l + 1] + 1
+            delta = None
+            if l == last_layer_index:
+                delta = math_util.MatrixHadamardProduct(
+                    [[learning_rate * (1.0 - x) for x in c[l][1:]]],
+                    math_util.MatrixHadamardProduct(
+                        [c[l][1:]],
+                        [math_util.VectorDifference(t[1], c[l][1:])]))
+            else:
+                W = math_util.MatrixHadamardProduct(
+                    self._weights[l],
+                    weights_gradient[l])
+                W = [[sum(w) for w in math_util.MatrixTranspose(W)]]
+                delta = math_util.MatrixHadamardProduct(
+                    [[1.0 - x for x in c[l]]], W)
+                delta = [delta[0][1:]]
 
-            for i in xrange(1, current_layer_width_plus_one):
-                common_weight_gradient = 0.0
-                if l == last_layer_index:
-                    common_weight_gradient = (
-                        (t[1][i - 1] - c[l][i]) * c[l][i] * (1.0 - c[l][i]) *
-                        learning_rate)
-                else:
-                    common_weight_gradient = 0.0
-                    for k in xrange(1, previous_layer_width_plus_one):
-                        common_weight_gradient += (
-                            self._weights[l][k - 1][i] *
-                            weights_gradient[l][k - 1][i])
-                    common_weight_gradient *= (1.0 - c[l][i])
-
-                for j in xrange(next_layer_width_plus_one):
-                    weights_gradient[l - 1][i - 1][j] = (
-                        common_weight_gradient * c[l - 1][j])
+            weights_gradient[l - 1] = math_util.MatrixMult(
+                math_util.MatrixTranspose(delta), [c[l - 1]])
 
         return weights_gradient
 
