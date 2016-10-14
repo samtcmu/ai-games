@@ -1,3 +1,4 @@
+import itertools
 import math_util
 import pickle
 import progress_bar
@@ -76,22 +77,16 @@ class NeuralNetwork:
         for l in xrange(last_layer_index, 0, -1):
             delta = None
             if l == last_layer_index:
-                delta = math_util.MatrixHadamardProduct(
-                    [[learning_rate * (1.0 - x) for x in c[l][1:]]],
-                    math_util.MatrixHadamardProduct(
-                        [c[l][1:]],
-                        [math_util.VectorDifference(t[1], c[l][1:])]))
+                delta = [learning_rate * (1.0 - x) * x * (y - x)
+                         for x, y in itertools.izip(c[l][1:], t[1])]
             else:
-                W = math_util.MatrixHadamardProduct(
-                    self._weights[l],
-                    weights_gradient[l])
-                W = [[sum(w) for w in math_util.MatrixTranspose(W)]]
-                delta = math_util.MatrixHadamardProduct(
-                    [[1.0 - x for x in c[l]]], W)
-                delta = [delta[0][1:]]
+                W = math_util.MatrixHadamardProductSumRows(
+                    self._weights[l], weights_gradient[l])
+                delta = [(1.0 - x) * y
+                         for x, y in itertools.izip(c[l][1:], W[1:])]
 
             weights_gradient[l - 1] = math_util.MatrixMult(
-                math_util.MatrixTranspose(delta), [c[l - 1]])
+                math_util.MatrixTranspose([delta]), [c[l - 1]])
 
         return weights_gradient
 

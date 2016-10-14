@@ -80,6 +80,18 @@ def MatrixScalarProduct(c, A):
     return [[c * A[i][j] for j in xrange(len(A[0]))]
                          for i in xrange(len(A))]
 
+def MatrixHadamardProductSumRows(A, B):
+    rows_A, cols_A = len(A), len(A[0])
+    rows_B, cols_B = len(B), len(B[0])
+    assert (rows_A == rows_B) and (cols_A == cols_B), (
+        "A = %d x %d, B = %d x %d" % (rows_A, cols_A, rows_B, cols_B))
+
+    output = [0.0 for _ in xrange(cols_A)]
+    for i in xrange(rows_A):
+        for j in xrange(cols_A):
+            output[j] += A[i][j] * B[i][j]
+    return output
+
 def TensorSum(A, B):
     for i in xrange(len(A)):
         len_A_i_j = len(A[i][0])
