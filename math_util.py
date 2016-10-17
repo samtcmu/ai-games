@@ -1,4 +1,5 @@
 import math
+import numpy
 
 def VectorDotProduct(A, B):
     assert len(A) == len(B), "len(A) = %d, len(B) = %d" % (len(A), len(B))
@@ -113,7 +114,7 @@ def TensorScalarProduct(c, A):
 
 def Sigmoid(x):
     try:
-        y = math.exp(x)
+        y = numpy.exp(x)
         return y / (y + 1.0)
     except OverflowError:
         return 1.0 if x > 0 else 0.0

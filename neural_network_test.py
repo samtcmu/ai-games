@@ -50,28 +50,31 @@ def NeuralNetworkTest(learning_iterations=10000, verbose=True):
         total_difference / len(test_data),)
     print "noise standard deviation around linear data: %.3f" % (noise_stdev,)
 
-def MnistTest(model_path_prefix="output/mnist/nn-model", verbose=False,
+def MnistTest(model_path_prefix="output/mnist/nn-model",
+              hidden_layer_widths=[30], learning_iterations=100, verbose=False,
               show_progress_bars=True):
-    training_data, test_data = mnist_data_loader.MnistData(verbose=verbose)
+    training_data, test_data = mnist_data_loader.MnistData(
+        verbose=show_progress_bars)
 
     validation_data = training_data[-len(training_data) / 6:]
     training_data = training_data[:-len(training_data) / 6]
 
     transformed_training_data = TransformMnistData(
-        training_data, description="training-data", verbose=verbose)
+        training_data, description="training-data", verbose=show_progress_bars)
     transformed_validation_data = TransformMnistData(
-        validation_data, description="validation-data", verbose=verbose)
+        validation_data, description="validation-data",
+        verbose=show_progress_bars)
     transformed_test_data = TransformMnistData(
-        test_data, description="test-data", verbose=verbose)
+        test_data, description="test-data", verbose=show_progress_bars)
 
     model = neural_network.NeuralNetwork(
         input_width=len(transformed_training_data[0][0]),
         output_width=len(transformed_training_data[0][1]),
-        hidden_layer_widths=[30])
+        hidden_layer_widths=hidden_layer_widths)
     model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(transformed_training_data,
                 learning_rate=0.05,
-                learning_iterations=100,
+                learning_iterations=learning_iterations,
                 regularization_rate=0.001,
                 model_path_prefix=model_path_prefix,
                 verbose=verbose,

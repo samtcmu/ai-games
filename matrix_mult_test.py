@@ -1,4 +1,4 @@
-import numpy as np;
+import numpy
 import random
 
 def MatrixMult(A, B):
@@ -18,19 +18,19 @@ def CustomTest(n=10, verbose=False):
             print f
 
 def NumpyTest(n=10, verbose=False):
-    F = np.array([[0.0, 1.0], [1.0, 1.0]])
-    f = np.array([[0.0], [1.0]])
+    F = numpy.array([[0.0, 1.0], [1.0, 1.0]])
+    f = numpy.array([[0.0], [1.0]])
     for i in range(n):
-        f = np.dot(F, f)
+        f = numpy.dot(F, f)
         if verbose:
             print f
 
 def NumpyRandomTest(n=10, k=1, verbose=False):
-    F = np.array([[random.uniform(-1.0, 1.0) for _ in xrange(n)]
+    F = numpy.array([[random.uniform(-1.0, 1.0) for _ in xrange(n)]
                                              for _ in xrange(n)])
-    f = np.array([[random.uniform(-1.0, 1.0)] for _ in xrange(n)])
+    f = numpy.array([[random.uniform(-1.0, 1.0)] for _ in xrange(n)])
     for i in range(k):
-        f = np.dot(F, f)
+        f = numpy.dot(F, f)
         if verbose:
             print f
 
@@ -45,9 +45,9 @@ def CustomRandomTest(n=10, k=1, verbose=False):
 
 def NumpyRandomColumnRowTest(n=10, k=1, verbose=False):
     for i in range(k):
-        a = np.array([[random.uniform(-1.0, 1.0)] for _ in xrange(n)])
-        b = np.array([[random.uniform(-1.0, 1.0) for _ in xrange(n)]])
-        c = np.dot(a, b)
+        a = numpy.array([[random.uniform(-1.0, 1.0)] for _ in xrange(n)])
+        b = numpy.array([[random.uniform(-1.0, 1.0) for _ in xrange(n)]])
+        c = numpy.dot(a, b)
         if verbose:
             print c
 
