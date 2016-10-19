@@ -3,13 +3,14 @@ import math
 import math_util
 import mnist_data_loader
 import neural_network
+import numpy
 import pickle
 import progress_bar
 import random
 
 def InverseSigmoid(x):
     try:
-        return -1.0 * (2000.0) * math.log((1.0 / x) - 1.0)
+        return -1.0 * 2000.0 * math.log((1.0 / x) - 1.0)
     except ZeroDivisionError:
         # x == 0.0
         return -2000.0
@@ -28,20 +29,26 @@ def NeuralNetworkTest(learning_iterations=10000, verbose=True):
 
     model = neural_network.NeuralNetwork(input_width=len(weights) - 1,
                                          output_width=1,
-                                         hidden_layer_widths=[16])
-    model.RandomizeWeights(random_range=(-1.0, 1.0))
+                                         hidden_layer_widths=[1])
+    model.RandomizeWeights(random_range=(-0.0001, 0.0001))
     model.Train(training_data,
-                learning_rate=0.004,
+                learning_rate=0.002,
                 learning_iterations=learning_iterations,
                 regularization_rate=0.0,
                 verbose=verbose)
+    # scaling_factor = 4.0
+    # model._weights = [
+    #     numpy.array([weights]) / (2000.0 * scaling_factor),
+    #     numpy.array([[2.0, 4.0]]) * scaling_factor,
+    # ]
 
+    print model
     total_difference = 0
     for t in test_data:
         actual = InverseSigmoid(model.Infer(t[0])[0])
         expected = InverseSigmoid(t[1][0])
         difference = abs(actual - expected)
-        if verbose:
+        if verbose and False:
             print "%s %s %s" % ("{0:9,.4f}".format(actual),
                                 "{0:9,.4f}".format(expected),
                                 "{0:9,.4f}".format(difference))
@@ -170,7 +177,7 @@ def CreateLinearTrainingData(weights, num_training_examples, low, high,
         input_data = [-1.0] + RandomVector(len(weights) - 1, low, high)
         expected_output = math_util.Sigmoid(
             (math_util.VectorDotProduct(input_data, weights) +
-            random.gauss(0.0, noise_stdev)) / 2000.0)
+             random.gauss(0.0, noise_stdev)) / 2000.0)
         training_data.append([input_data[1:], [expected_output]])
     return training_data
 

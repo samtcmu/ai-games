@@ -25,7 +25,7 @@ class NeuralNetwork:
                 output += "  neuron %d: " % (i + 1,)
                 for j in xrange(len(self._weights[l][i])):
                     # TODO(samt): Adjust the width based on the maximum weight.
-                    output += "{:4.2f}".format(self._weights[l][i][j],) + " "
+                    output += "{:7.5f}".format(self._weights[l][i][j],) + " "
                 output += "\n"
         return output
 
@@ -102,7 +102,7 @@ class NeuralNetwork:
                     T, k, verbose=show_progress_bars)
                 print "training iteration %d: model fitness = %s" % (
                     k, "{:,.8f}".format(current_fitness))
-                # print "model(%4d): \n%s" % (k, self)
+                print "model(%4d): \n%s" % (k, self)
 
             if model_path_prefix:
                 model_file_path = "%s-%d.txt" % (model_path_prefix, k)
