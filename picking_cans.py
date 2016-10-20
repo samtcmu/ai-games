@@ -5,6 +5,7 @@ import default_agent_state
 import radius_one_agent_state
 import radius_two_agent_state
 
+import deep_q_learning_model
 import genetic_algorithm_model
 import manual_model
 import q_learning_model
@@ -175,6 +176,49 @@ def shallow_q_learning(train_model=True, model_file=None, random_wall=False,
                 discount_rate=1.0,
                 exploration_rate=0.0,
                 agent_state_class=agent_state_class)
+        model.SetDisableTraining(True)
+        board = picking_cans_board.Board(
+            10, 10, agent_state_class=agent_state_class)
+        board.Randomize(random_wall=random_wall)
+        board.RandomizeCurrentPosition()
+        print "score: %d" % (board.PickCansWithModel(
+            model, actions_per_game=200, verbose=True),)
+
+def deep_q_learning(train_model=True, model_file=None, random_wall=False,
+                    agent_state_type="default", games=100000):
+    agent_state_class = GetAgentStateClass(agent_state_type)
+
+    if train_model:
+        deep_q_learning_model.Train(
+            rows=10,
+            columns=10,
+            random_wall=random_wall,
+            games=games,
+            actions_per_game=200,
+            learning_rate=0.1,
+            discount_rate=0.99,
+            exploration_rate=0.01,
+            neural_network_learning_rate=2.0,
+            model_save_frequency=100,
+            model_file_prefix="output/dql-model/dql-model",
+            agent_state_class=agent_state_class,
+            verbose=True)
+    else:
+        if model_file:
+            model = deep_q_learning_model.DeepQLearningModel(
+                learning_rate=0.1,
+                discount_rate=1.0,
+                exploration_rate=0.0,
+                neural_network_learning_rate=0.0000005,
+                filename=model_file,
+                agent_state_class=agent_state_class)
+        else:
+            model = deep_q_learning_model.DeepQLearningModel(
+                learning_rate=0.1,
+                discount_rate=1.0,
+                exploration_rate=0.0,
+                agent_state_class=agent_state_class)
+        model.SetDisableTraining(True)
         board = picking_cans_board.Board(
             10, 10, agent_state_class=agent_state_class)
         board.Randomize(random_wall=random_wall)

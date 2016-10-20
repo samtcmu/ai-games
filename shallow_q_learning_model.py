@@ -81,7 +81,7 @@ class ShallowQLearningModel(model.Model):
 
         return feature_vector
 
-    def SetDisableTraining(disable_training):
+    def SetDisableTraining(self, disable_training):
         self._disable_training = disable_training
 
     def ActionForState(self, state):
@@ -108,9 +108,7 @@ class ShallowQLearningModel(model.Model):
             ((1.0 - self._learning_rate) *
              self._q_matrix_model.Infer(initial_feature_vector)) +
             (self._learning_rate *
-             (reward + (self._discount_rate *
-              self._q_matrix_model.Infer(self._FeatureVector(
-                  final_state, best_action))))))
+             (reward + (self._discount_rate * action_values[best_action]))))
 
         self._q_matrix_model.Train([
             [initial_feature_vector, updated_q_value]],

@@ -119,6 +119,16 @@ def Sigmoid(x):
     except OverflowError:
         return 1.0 if x > 0 else 0.0
 
+def InverseSigmoid(x, max_value=1.0):
+    try:
+        return -1.0 * max_value * math.log((1.0 / x) - 1.0)
+    except ZeroDivisionError:
+        # x == 0.0
+        return -1.0 * max_value
+    except ValueError:
+        # (1.0 / x) - 1.0 == 0.0
+        return max_value
+
 def MatrixAsString(A, fmt=None):
     output = ""
     for r in xrange(len(A)):

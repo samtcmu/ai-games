@@ -8,16 +8,6 @@ import pickle
 import progress_bar
 import random
 
-def InverseSigmoid(x):
-    try:
-        return -1.0 * 2000.0 * math.log((1.0 / x) - 1.0)
-    except ZeroDivisionError:
-        # x == 0.0
-        return -2000.0
-    except ValueError:
-        # (1.0 / x) - 1.0 == 0.0
-        return 2000.0
-
 def NeuralNetworkTest(learning_iterations=10000, verbose=True):
     noise_stdev = 5.0
     inputs = 6
@@ -29,10 +19,10 @@ def NeuralNetworkTest(learning_iterations=10000, verbose=True):
 
     model = neural_network.NeuralNetwork(input_width=len(weights) - 1,
                                          output_width=1,
-                                         hidden_layer_widths=[1])
-    model.RandomizeWeights(random_range=(-0.0001, 0.0001))
+                                         hidden_layer_widths=[])
+    model.RandomizeWeights(random_range=(-1.0, 1.0))
     model.Train(training_data,
-                learning_rate=0.002,
+                learning_rate=0.000001,
                 learning_iterations=learning_iterations,
                 regularization_rate=0.0,
                 verbose=verbose)
@@ -45,8 +35,9 @@ def NeuralNetworkTest(learning_iterations=10000, verbose=True):
     print model
     total_difference = 0
     for t in test_data:
-        actual = InverseSigmoid(model.Infer(t[0])[0])
-        expected = InverseSigmoid(t[1][0])
+        actual = math_util.InverseSigmoid(
+            model.Infer(t[0])[0], max_value=2000.0)
+        expected = math_util.InverseSigmoid(t[1][0], max_value=2000.0)
         difference = abs(actual - expected)
         if verbose and False:
             print "%s %s %s" % ("{0:9,.4f}".format(actual),

@@ -4,6 +4,7 @@ import default_agent_state
 import radius_one_agent_state
 import radius_two_agent_state
 
+import deep_q_learning_model
 import genetic_algorithm_model
 import manual_model
 import q_learning_model
@@ -39,6 +40,10 @@ def GetModelClass(model_type):
             filename=f,
             agent_state_class=a)),
         "shallow-q-learning": (lambda f, a: shallow_q_learning_model.ShallowQLearningModel(
+            disable_training=True,
+            filename=f,
+            agent_state_class=a)),
+        "deep-q-learning": (lambda f, a: deep_q_learning_model.DeepQLearningModel(
             disable_training=True,
             filename=f,
             agent_state_class=a)),

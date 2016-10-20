@@ -4,7 +4,7 @@ import random
 
 def LinearRegressionTest(verbose=True):
     expected_weights = [200.0, 10.0, 200.0, -43.0, 1.0, -314.0]
-    noise_stdev = 1.0
+    noise_stdev = 5.0
     training_data = CreateTrainingData(
         expected_weights, 1000, -100.0, 100.0, noise_stdev=noise_stdev)
     test_data = CreateTrainingData(
@@ -13,7 +13,7 @@ def LinearRegressionTest(verbose=True):
     model = linear_regression.LinearRegression(len(expected_weights) - 1)
     model.RandomizeWeights(random_range=(-1000.0, 1000.0))
     model.Train(training_data,
-                learning_rate=0.000001,
+                learning_rate=0.004,
                 learning_iterations=10000,
                 regularization_rate=0.0,
                 verbose=verbose)
