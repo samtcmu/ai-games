@@ -112,16 +112,16 @@ class DeepQLearningModel(model.Model):
             for a in picking_cans_board.ACTIONS]
         best_action = list_util.MaxIndices(action_values)[0]
         initial_feature_vector = self._FeatureVector(initial_state, action)
-        updated_q_value = (
+        updated_q_value = math_util.Sigmoid((1 / 2000.0) * (
             ((1.0 - self._learning_rate) *
              math_util.InverseSigmoid(
                 self._q_matrix_model.Infer(initial_feature_vector),
                 max_value=2000.0)) +
             (self._learning_rate *
-             (reward + (self._discount_rate * action_values[best_action]))))
+             (reward + (self._discount_rate * action_values[best_action])))))
 
-        self._q_matrix_model.Train([
-            [initial_feature_vector, math_util.Sigmoid(updated_q_value / 2000.0)]],
+        self._q_matrix_model.Train(
+            [[initial_feature_vector, updated_q_value]],
             learning_rate=self._neural_network_learning_rate,
             learning_iterations=1,
             regularization_rate=0.0,
