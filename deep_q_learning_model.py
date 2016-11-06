@@ -154,7 +154,7 @@ def Train(rows=10, columns=10, random_wall=False, games=200,
             latest_score[i % len(latest_score)] = score
 
         if verbose:
-            print "game %7d: %3d %.2f %.2f" % (
+            print "game {:7d}: {:5d} {:7.2f} {:7.2f}".format(
                 i, score, list_util.Mean(latest_score),
                 list_util.StandardDeviation(latest_score))
         if model_file_prefix and (i % model_save_frequency == 0):

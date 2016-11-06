@@ -3,6 +3,30 @@
 The goal of this project is to collect various AIs that can learn to play simple
 games.
 
+# Deep Q-Learning
+
+To train a model run the following:
+
+```
+mkdir -p output/sql-model
+python -c 'import picking_cans; picking_cans.deep_q_learning()'
+```
+
+As training continues model files will be written to the output directory.
+
+```
+% ls output/dql-model
+dql-model-100.txt       dql-model-200.txt      dql-model-300.txt      dql-model-400.txt
+```
+
+Models will be saved to output/dql-model. To run a model (say
+output/ql-model/dql-model-400.txt) on a random board run the following:
+
+```
+python -c 'import picking_cans; picking_cans.deep_q_learning(\
+    train_model=False, model_file="output/dql-model/dql-model-400.txt")' | less -r
+```
+
 # Shallow Q-Learning
 
 To train a model run the following:
