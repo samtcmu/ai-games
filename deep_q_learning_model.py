@@ -10,6 +10,7 @@ import random
 class DeepQLearningModel(model.Model):
     def __init__(self, learning_rate=1.0, discount_rate=1.0,
                  exploration_rate=0.1, neural_network_learning_rate=0.1,
+                 hidden_layer_widths=[],
                  agent_state_class=default_agent_state.DefaultAgentState,
                  filename=None, disable_training=False):
         self._learning_rate = learning_rate
@@ -29,7 +30,8 @@ class DeepQLearningModel(model.Model):
             self.LoadFromFile(filename)
         else:
             self._q_matrix_model = neural_network.NeuralNetwork(
-                self._feature_vector_size, 1, hidden_layer_widths=[])
+                self._feature_vector_size, 1,
+                hidden_layer_widths=hidden_layer_widths)
             self._q_matrix_model.RandomizeWeights(random_range=(-0.1, 0.1))
 
     def __str__(self):
@@ -130,7 +132,8 @@ class DeepQLearningModel(model.Model):
 def Train(rows=10, columns=10, random_wall=False, games=200,
           actions_per_game=200, learning_rate=0.1, discount_rate=0.9,
           exploration_rate=0.1, neural_network_learning_rate=0.1,
-          model_save_frequency=1000, model_file_prefix=None,
+          hidden_layer_widths=[], model_save_frequency=1000,
+          model_file_prefix=None,
           agent_state_class=default_agent_state.DefaultAgentState,
           verbose=False):
     model = DeepQLearningModel(
@@ -138,6 +141,7 @@ def Train(rows=10, columns=10, random_wall=False, games=200,
         discount_rate=discount_rate,
         exploration_rate=exploration_rate,
         neural_network_learning_rate=neural_network_learning_rate,
+        hidden_layer_widths=hidden_layer_widths,
         agent_state_class=agent_state_class)
     board = picking_cans_board.Board(
         rows, columns, agent_state_class=agent_state_class)
